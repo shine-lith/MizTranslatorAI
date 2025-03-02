@@ -4,19 +4,21 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
-import { definePreset } from '@primeuix/themes';
+import { definePreset } from '@primeuix/themes'
+import ToastService from 'primevue/toastservice'
 
-const MyPreset = definePreset(Aura,{
+const MyPreset = definePreset(Aura, {
   components: {
-    button:{
-      border:{
-        radius : "0px"
+    button: {
+      border: {
+        radius: '0px'
       }
     }
   }
 })
 
 const app = createApp(App)
+app.use(ToastService)
 app.use(PrimeVue, {
   theme: {
     preset: MyPreset,

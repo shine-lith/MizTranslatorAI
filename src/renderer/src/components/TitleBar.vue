@@ -5,6 +5,9 @@ import Button from 'primevue/button'
 defineProps({
   msg: String
 })
+const onDev = () => {
+  window.api.onDevFunction()
+}
 
 // 最小化
 const onMinimize = () => {
@@ -12,9 +15,8 @@ const onMinimize = () => {
 }
 
 // 打开文件
-const onOpenFile = async () => {
-  const result = await window.electronAPI.openFile()
-  console.log(result)
+const onOpenFile = () => {
+  window.api.openFile()
 }
 
 const count = ref(0)
@@ -27,6 +29,7 @@ const count = ref(0)
     <Button click="handleQ('request')" label="保存" icon="pi pi-save" variant="text" />
     <Button label="打包" icon="pi pi-export" variant="text" />
     <Button label="设置" icon="pi pi-cog" variant="text" />
+    <Button @click="onDev" label="DEV" />
     <Button @click="onMinimize" label="最小化" />
     <Button @click="" label="全屏" />
     <Button @click="" label="退出" />
