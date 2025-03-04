@@ -6,3 +6,4 @@ out
 *.log*
 pnpm-lock.yaml
 db
+*.miz
