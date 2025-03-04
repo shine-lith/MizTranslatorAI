@@ -5,8 +5,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import yauzl from 'yauzl'
-const low = require("lowdb");
-const FileSync = require("lowdb/adapters/FileSync");
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
 const luaparse = require('luaparse')
 var md5 = require('md5')
 
@@ -41,11 +41,12 @@ var tranNeedSave = false // tran文件保存状态
 // 设置lowdb 使用JSON序列化进行存储,默认存储的JSON格式是人类友好的格式，空间占用大
 var dbAdapter = new FileSync(FILE_DB, {
   serialize: (data) => JSON.stringify(data),
-  deserialize: (data) => JSON.parse(data),
-});
-var db = low(dbAdapter);
+  deserialize: (data) => JSON.parse(data)
+})
+var db = low(dbAdapter)
 
 function createWindow(): void {
+  // 设置Menu
   initDb()
 
   win = new BrowserWindow({
@@ -58,12 +59,12 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     },
-    icon: "app.ico"
+    icon: '/app.ico'
   })
-  
-  win.setTitle(APP_NAME);
-  var bounds = getSettings(SETID_WINDOWS_BOUNDS, null);
-  if (bounds) win.setBounds(bounds);
+
+  win.setTitle(APP_NAME)
+  var bounds = getSettings(SETID_WINDOWS_BOUNDS, null)
+  if (bounds) win.setBounds(bounds)
 
   win.on('ready-to-show', () => {
     win.show()
@@ -182,16 +183,11 @@ function initDb() {
 // setid settings的key
 // defaultValue 当不存在该值时的默认值
 function getSettings(setid, defaultValue) {
-  return db
-    .get("settings")
-    .get(setid, defaultValue)
-    .value();
+  return db.get('settings').get(setid, defaultValue).value()
 }
 
 function saveSettings(setid, value) {
-  db.get("settings")
-    .set(setid, value)
-    .write();
+  db.get('settings').set(setid, value).write()
 }
 
 // 保存APP设置
@@ -227,12 +223,24 @@ function loadMizFile(file) {
   debugInfo('MainloadMizFile:' + file)
   fs.readFile(file, 'utf8', (err, data) => {
     yauzl.open(file, { lazyEntries: true }, function (err, zipfile) {
-      if (err) throw err
+      if (err) {
+        win.webContents.send('onMizOpen', 400)
+        clearProjectWorkPath()
+        notification('无法打开此文件', '因为文件格式存在问题', null)
+        debugInfo('Cant read miz like zip')
+        throw err
+      }
       zipfile.readEntry()
       zipfile.on('entry', (entry) => {
         if (entry.fileName === 'l10n/DEFAULT/dictionary') {
           zipfile.openReadStream(entry, function (err, readStream) {
-            if (err) throw err
+            if (err) {
+              win.webContents.send('onMizOpen', 400)
+              clearProjectWorkPath()
+              notification('无法打开此文件', '文件可能已损坏', null)
+              debugInfo('Cant read l10n/DEFAULT/dictionary')
+              throw err
+            }
             setProjectWorkPath(file)
             readStream.on('data', function (data) {
               var listData = loadLua(data.toString('utf8'))
@@ -378,15 +386,14 @@ function setAppTitle(title) {
   }
 }
 
-
 // 保存到db Setting
-ipcMain.on("saveSetting", (e, data) => {
-  var settings = getSettings(data.key, null);
-  var value;
+ipcMain.on('saveSetting', (e, data) => {
+  var settings = getSettings(data.key, null)
+  var value
   if (settings) {
-    value = Object.assign(settings, data.value);
+    value = Object.assign(settings, data.value)
   } else {
-    value = data.value;
+    value = data.value
   }
-  saveSettings(data.key, value);
-});
+  saveSettings(data.key, value)
+})
