@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, clipboard } from 'electron'
 import { join } from 'path'
 import path from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -385,6 +385,173 @@ function setAppTitle(title) {
     win.setTitle(APP_NAME)
   }
 }
+
+//////////////////////////////菜单响应///////////////////////////////////
+// 清理翻译缓存
+function cleanTranslateCache() {
+  var bytetostring = (bytes) => {
+    if (bytes < 1024) return bytes + 'B'
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(3) + 'KB'
+    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(3) + 'MB'
+    else return (bytes / 1073741824).toFixed(3) + 'GB'
+  }
+  var dbStat = fs.statSync(FILE_DB)
+  db.get('cache')
+    .remove()
+    .write()
+  notification('翻译缓存已清除', '释放 ' + bytetostring(dbStat.size) + ' 空间', null)
+}
+
+//////////////////////////////UI消息响应///////////////////////////////////
+ipcMain.on('window-min', () => win.minimize())
+
+//最大化
+ipcMain.on('window-max', function() {
+  if (win.isMaximized()) {
+    win.restore()
+  } else {
+    win.maximize()
+  }
+})
+
+ipcMain.on('window-close', () => win.close())
+
+ipcMain.on('getSettings', (e, setid) => {
+  var value = getSettings(setid, null)
+})
+
+// 复制文字到剪贴板
+ipcMain.on('textToClipboard', (e, text) => {
+  clipboard.writeText(text)
+  notification('内容已复制','',null)
+})
+
+// 打开文件
+ipcMain.on('openFile', (e) => {
+  openFile()
+})
+
+// 保存工程并关闭
+ipcMain.on('onCloseAndSaveProject', (e, data) => {
+  saveTranFile(data)
+  win = null
+  app.exit()
+})
+
+// 保存工程
+ipcMain.on('saveProject', (e, data) => {
+  var tranFilePath = saveTranFile(data)
+  notification('工程已保存', '<span class=\'action\'>点击此处打开保存位置</span>', {
+    method: 'openFolder',
+    args: tranFilePath,
+  })
+  tranNeedSave = false
+})
+
+// 导出miz文件
+ipcMain.on('exportToMiz', (e, d) => {
+  const DCS_DICT_STR_BR = '\\\n'
+
+  // 将文本转换为DCS Dict的格式
+  var toDcsDictStr = function(str) {
+    var str = str.replace(new RegExp('\n', 'gm'), DCS_DICT_STR_BR); // 过滤换行 把换行转为 \
+    str = str.replace(new RegExp('"', 'gm'), '\\"'); // 过滤 双引号
+    return str
+  }
+
+  // 生成DCS miz里Dictionary文件内容
+  // var buildDcsDictionaryContent = function(data) {
+  //   var dictionaryContent = ''
+  //   dictionaryContent += 'dictionary = \n{\n'
+  //   data.forEach((item) => {
+  //     if (item.translateText) {
+  //       var key = item.key
+  //       var translateText = toDcsDictStr(item.translateText)
+  //       // if (store.translate_compare) {
+  //         // 对照模式 把原文加到译文里
+  //         translateText =
+  //           toDcsDictStr(item.originText) + DCS_DICT_STR_BR + DCS_DICT_STR_BR + DCS_DICT_STR_BR + translateText
+  //       // }
+  //       dictionaryContent += `    ['${key}'] = '${translateText}',\n`
+  //     }
+  //   })
+  //   dictionaryContent += '} -- end of dictionary\n'
+  //   return dictionaryContent
+  // }
+
+  // var exportMiz = async function(mizFile, exportMizFile, dataTable) {
+    // var dictionaryContent = buildDcsDictionaryContent(dataTable)
+    // 往副本中添加翻译文件
+  //   fs.readFile(mizFile, (err, data) => {
+  //     var zip = new JSzip()
+  //     zip.loadAsync(data).then(
+  //       (zip) => {
+  //         zip.file('l10n/CN/dictionary', dictionaryContent)
+  //         zip
+  //           .generateNodeStream({ type: 'nodebuffer', streamFiles: true })
+  //           .pipe(fs.createWriteStream(exportMizFile))
+  //           .on('finish', () => {
+  //             debugInfo('Export miz file : ' + exportMizFile)
+  //             notification('打包完成', '<span class=\'action\'>点击此处打开保存位置</span>', {
+  //               method: 'openFolder',
+  //               args: exportMizFile,
+  //             })
+  //           })
+  //       },
+  //       (error) => {
+  //         debugInfo('Export miz fail')
+  //       }
+  //     )
+  //   })
+  // }
+
+  // var data = d.data
+  // var store = d.store
+
+  // if (fs.existsSync(mizFile)) {
+  //   if (store.merge_to_miz) {
+  //     if (store.backup_orign_miz) { //备份原文件
+  //       fs.copyFileSync(mizFile, projectFileNameBase + '_Backup.miz')
+  //     }
+  //     exportMiz(mizFile, mizFile, data) // 覆盖到原文件
+  //   } else {
+  //     //让用户选择打包位置
+
+  //     const { canceled, filePath } = await dialog.showSaveDialog({
+  //       title: '保存到',
+  //       defaultPath: projectFileNameBase + '_CN.miz',
+  //       filters: [{ name: 'DCS World 任务', extensions: ['miz'] }],
+  //     })
+    
+  //     if (!canceled) {
+  //       exportMiz(mizFile, filePath, data)
+  //     }
+  //   }
+  // } else {
+  //   notification('打包失败，原文件不存在!', '', null)
+  //   debugInfo('mizFile not exist')
+  // } 
+})
+
+// 存在新的修改
+ipcMain.on('onTranslateTextChange', (e) => {
+  tranNeedSave = true
+})
+
+// 清除翻译缓存
+ipcMain.on('cleanTranslateCache', (e) => {
+  cleanTranslateCache()
+})
+
+// 打开文件管理器
+ipcMain.on('openFolder', (e, data) => {
+  shell.showItemInFolder(data)
+})
+
+// 使用外部浏览器打开网页
+ipcMain.on('openURL', (e, data) => {
+  shell.openExternal(data)
+})
 
 // 保存到db Setting
 ipcMain.on('saveSetting', (e, data) => {
