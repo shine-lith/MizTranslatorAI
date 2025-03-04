@@ -5,6 +5,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import yauzl from 'yauzl'
+const low = require("lowdb");
+const FileSync = require("lowdb/adapters/FileSync");
 const luaparse = require('luaparse')
 var md5 = require('md5')
 
@@ -36,8 +38,12 @@ var mizFile = ''
 var projectPath = ''
 var projectFileNameBase = null
 var tranNeedSave = false // tran文件保存状态
-
-const defaultData = { settings: {}, cache: [] }
+// 设置lowdb 使用JSON序列化进行存储,默认存储的JSON格式是人类友好的格式，空间占用大
+var dbAdapter = new FileSync(FILE_DB, {
+  serialize: (data) => JSON.stringify(data),
+  deserialize: (data) => JSON.parse(data),
+});
+var db = low(dbAdapter);
 
 function createWindow(): void {
   initDb()
@@ -51,8 +57,13 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
-    }
+    },
+    icon: "app.ico"
   })
+  
+  win.setTitle(APP_NAME);
+  var bounds = getSettings(SETID_WINDOWS_BOUNDS, null);
+  if (bounds) win.setBounds(bounds);
 
   win.on('ready-to-show', () => {
     win.show()
@@ -164,18 +175,23 @@ ipcMain.on('close', (e) => {
 
 // 初始化系统设置存储
 function initDb() {
-  //db.defaults({ settings: {}, cache: [] }).write()
+  db.defaults({ settings: {}, cache: [] }).write()
 }
 
 // 从settings中加载
 // setid settings的key
 // defaultValue 当不存在该值时的默认值
 function getSettings(setid, defaultValue) {
-  // return db.get('settings').get(setid, defaultValue).value()
+  return db
+    .get("settings")
+    .get(setid, defaultValue)
+    .value();
 }
 
 function saveSettings(setid, value) {
-  // db.get('settings').set(setid, value).write()
+  db.get("settings")
+    .set(setid, value)
+    .write();
 }
 
 // 保存APP设置
@@ -361,3 +377,16 @@ function setAppTitle(title) {
     win.setTitle(APP_NAME)
   }
 }
+
+
+// 保存到db Setting
+ipcMain.on("saveSetting", (e, data) => {
+  var settings = getSettings(data.key, null);
+  var value;
+  if (settings) {
+    value = Object.assign(settings, data.value);
+  } else {
+    value = data.value;
+  }
+  saveSettings(data.key, value);
+});
