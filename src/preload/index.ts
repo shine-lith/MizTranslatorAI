@@ -1,11 +1,16 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { on } from 'events'
 
 // Custom APIs for renderer
 const api = {
   onDevFunction: () => ipcRenderer.send('dev:devFunction'),
-  onMinimize: () => ipcRenderer.send('window:minimize'),
-  openFile: () => ipcRenderer.send('titlebar:openFile')
+  onWinMinimize: () => ipcRenderer.send('window:minimize'),
+  onWinMaximize: () => ipcRenderer.send('window:maximize'),
+  onWinClose: () => ipcRenderer.send('window:close'),
+  onOpenFile: () => ipcRenderer.send('titlebar:openFile'),
+  onSaveFile: () => ipcRenderer.send('titlebar:saveFile'),
+  onExportToMiz: () => ipcRenderer.send('titlebar:exportToMiz')
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

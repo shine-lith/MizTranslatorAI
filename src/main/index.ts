@@ -128,10 +128,6 @@ ipcMain.on('dev:devFunction', () => {
   notification('通知', '这是一个通知', null)
 })
 
-ipcMain.on('window:minimize', () => {
-  win.minimize()
-})
-
 ipcMain.on('titlebar:openFile', async () => {
   openFile()
 })
@@ -145,30 +141,30 @@ ipcMain.on('close', (e) => {
   saveWindowSettings()
   if (tranNeedSave) {
     e.preventDefault()
-    // dialog.showMessageBox(
-    //   win,
-    //   {
-    //     title: APP_NAME,
-    //     message: '是否要保存翻译工程?',
-    //     buttons: ['保存', '不保存', '取消'],
-    //     cancelId: 2
-    //   },
-    //   (btnId) => {
-    //     switch (btnId) {
-    //       case 0:
-    //         win.webContents.send('callSaveProjectAndClose', 200)
-    //         e.preventDefault()
-    //         break
-    //       case 1:
-    //         win = null
-    //         app.exit()
-    //         break
-    //       case 2:
-    //       default:
-    //         e.preventDefault()
-    //     }
-    //   }
-    // )
+
+    var response = dialog.showMessageBoxSync(
+      win,
+      {
+        title: APP_NAME,
+        message: '是否要保存翻译工程?',
+        buttons: ['保存', '不保存', '取消'],
+        cancelId: 2
+      }
+    )
+
+    switch (response) {
+      case 0:
+        win.webContents.send('callSaveProjectAndClose', 200)
+        e.preventDefault()
+        break
+      case 1:
+        win = null
+        app.exit()
+        break
+      case 2:
+      default:
+        e.preventDefault()
+    }
   }
 })
 
@@ -403,10 +399,10 @@ function cleanTranslateCache() {
 }
 
 //////////////////////////////UI消息响应///////////////////////////////////
-ipcMain.on('window-min', () => win.minimize())
+ipcMain.on('window:minimize', () => win.minimize())
 
 //最大化
-ipcMain.on('window-max', function() {
+ipcMain.on('window:maximize', function() {
   if (win.isMaximized()) {
     win.restore()
   } else {
@@ -414,7 +410,7 @@ ipcMain.on('window-max', function() {
   }
 })
 
-ipcMain.on('window-close', () => win.close())
+ipcMain.on('window:close', () => win.close())
 
 ipcMain.on('getSettings', (e, setid) => {
   var value = getSettings(setid, null)
