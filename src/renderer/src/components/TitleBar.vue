@@ -60,7 +60,7 @@ const openedFile = ref('')
     </div>
     <div id="apptitle" class="flex-auto m-6">{{ openedFile }}mizTranslator</div>
     <div id="winctrl" class="flex-none">
-      <Button id="win_min" @click="onWinMinimize" variant="text" icon="fa-regular fa-window-minimize"></Button>
+      <Button id="win_min" @click="onWinMinimize" variant="text" icon="pi pi-minus"></Button>
       <Button id="win_max" @click="onWinMaximize" variant="text" icon="fa-regular fa-square"></Button>
       <Button id="win_close" @click="onWindowClose" variant="text" icon="pi pi-times"></Button>
     </div>
