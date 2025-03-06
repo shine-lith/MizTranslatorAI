@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import Button from 'primevue/button'
+import { ref } from 'vue'
 import TextList from './components/TextList.vue'
 import TitleBar from './components/TitleBar.vue'
+import TranslationAssistant from './components/TranslationAssistant.vue'
+import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 
-import { ref } from 'vue'
 
 const toast = useToast()
 //const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
@@ -28,16 +29,18 @@ window.electron.ipcRenderer.on('onMizOpen', (e, code, data) => {
     listdata.value = data.data
   }
 })
-
-function onButton() {
-  projectPath.value = 'aa'
-}
 </script>
 
 <template>
   <TitleBar />
-  <Button label="Dev in Vue" @click="onButton" />
-  <TextList :tableData="listdata" :projectPath="projectPath" />
+  <div class="flex">
+    <div class="flex-auto">
+      <TextList :tableData="listdata" :projectPath="projectPath" />
+    </div>
+    <div class="w-200 flex-none h-dvh">
+      <TranslationAssistant/>
+    </div>
+  </div>
   <Toast />
 </template>
 ]
