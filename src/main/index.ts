@@ -331,10 +331,10 @@ function loadLua(fileContent) {
   return listData
 }
 // 保存翻译工程
-function saveTranFile(data) {
-  var fileContent = JSON.stringify(data)
+function saveTranFile(json_data) {
+  //var fileContent = JSON.stringify(data)
   var tranFilePath = projectFileNameBase + '.tran'
-  fs.writeFileSync(tranFilePath, fileContent)
+  fs.writeFileSync(tranFilePath, json_data)
   return tranFilePath
 }
 
@@ -435,7 +435,7 @@ ipcMain.on('onCloseAndSaveProject', (e, data) => {
 })
 
 // 保存工程
-ipcMain.on('saveProject', (e, data) => {
+ipcMain.on('titlebar:saveFile', (e, data) => {
   var tranFilePath = saveTranFile(data)
   notification('工程已保存', '<span class=\'action\'>点击此处打开保存位置</span>', {
     method: 'openFolder',

@@ -1,17 +1,19 @@
-<script setup lang="ts">
+<script setup>
+import { store } from '../store.js'
+
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 
-defineProps({
-  tableData: Array,
-})
+// defineProps({
+//   tableData: Array,
+// })
 
 </script>
 
 <template>
   <!-- {{ store.projectPath }} -->
   <div class="card">
-    <DataTable :value="tableData" stripedRows columnResizeMode="fit">
+    <DataTable :value="store.listdata" stripedRows columnResizeMode="fit">
       <Column field="key" header="key"></Column>
       <Column field="type" header="type"></Column>
       <Column field="originText" header="originText"></Column>
