@@ -9,7 +9,7 @@ const api = {
   onWinMaximize: () => ipcRenderer.send('window:maximize'),
   onWinClose: () => ipcRenderer.send('window:close'),
   onOpenFile: () => ipcRenderer.send('titlebar:openFile'),
-  onSaveFile: () => ipcRenderer.send('titlebar:saveFile'),
+  onSaveFile: (onSaveFile) => ipcRenderer.send('titlebar:saveFile',onSaveFile),
   onExportToMiz: () => ipcRenderer.send('titlebar:exportToMiz')
 }
 

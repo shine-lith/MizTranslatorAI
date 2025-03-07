@@ -11,7 +11,8 @@ defineExpose({
   setTitle
 })
 
-const emit = defineEmits(['onSaveFile'])
+const emit = defineEmits(['onOpenFile', 'onSaveFile'])
+
 const titleText = ref('mizTranslator')
 
 // watch (
@@ -25,13 +26,13 @@ function setTitle(title) {
   titleText.value = title
 }
 
-function onDev(){
+function onDev() {
   window.api.onDevFunction()
 }
 
 // 打开文件
 function onOpenFile() {
-  window.api.onOpenFile()
+  emit('onOpenFile')
 }
 
 // 保存文件
@@ -60,11 +61,7 @@ function onWindowClose() {
 }
 
 // 显示设置
-function showPreference() {
-  
-}
-
-
+function showPreference() {}
 </script>
 
 <template>
@@ -80,14 +77,19 @@ function showPreference() {
     <div id="apptitle" class="flex-auto m-6">{{ titleText }}</div>
     <div id="winctrl" class="flex-none">
       <Button id="win_min" @click="onWinMinimize" variant="text" icon="pi pi-minus"></Button>
-      <Button id="win_max" @click="onWinMaximize" variant="text" icon="fa-regular fa-square"></Button>
+      <Button
+        id="win_max"
+        @click="onWinMaximize"
+        variant="text"
+        icon="fa-regular fa-square"
+      ></Button>
       <Button id="win_close" @click="onWindowClose" variant="text" icon="pi pi-times"></Button>
     </div>
   </div>
 </template>
 
 <style scoped>
-#win_close:hover{
+#win_close:hover {
   background-color: red;
 }
 </style>
