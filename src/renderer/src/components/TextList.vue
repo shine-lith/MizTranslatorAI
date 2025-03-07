@@ -2,22 +2,23 @@
 import { ref, onMounted } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
+import { store } from '../store.js'
 
 onMounted(() => {
   console.log('tableData')
   console.log('projectPath')
 })
 
-defineProps({
-  tableData: Array,
-  projectPath: String
-})
+// defineProps({
+//   tableData: Array,
+//   projectPath: String
+// })
 </script>
 
 <template>
-  {{ projectPath }}
+  {{ store.projectPath }}
   <div class="card">
-    <DataTable :value="tableData" resizableColumns columnResizeMode="fit">
+    <DataTable :value="store.listdata" stripedRows resizableColumns columnResizeMode="expand">
       <Column field="key" header="key"></Column>
       <Column field="type" header="type"></Column>
       <Column field="originText" header="originText"></Column>

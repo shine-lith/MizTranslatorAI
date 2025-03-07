@@ -1,11 +1,21 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { store } from '../store.js'
 import Button from 'primevue/button'
 
 defineProps({
   msg: String
 })
 
+const emit = defineEmits(['onSaveFile'])
+const titleText = ref('mizTranslator')
+
+watch (
+  () => store.mizFile,
+  (newVal, oldVal) => {
+    titleText.value = `mizTranslator - ${newVal}`
+  }
+)
 const onDev = () => {
   window.api.onDevFunction()
 }
@@ -17,7 +27,7 @@ const onOpenFile = () => {
 
 // 保存文件
 const onSaveFile = () => {
-  window.api.onSaveFile()
+  emit('onSaveFile')
 }
 
 // 打包
@@ -58,7 +68,7 @@ const openedFile = ref('')
       <Button @click="showPreference" label="设置" icon="pi pi-cog" variant="text" />
       <Button @click="onDev" label="MAIN DEV" />
     </div>
-    <div id="apptitle" class="flex-auto m-6">{{ openedFile }}mizTranslator</div>
+    <div id="apptitle" class="flex-auto m-6">{{ titleText }}</div>
     <div id="winctrl" class="flex-none">
       <Button id="win_min" @click="onWinMinimize" variant="text" icon="pi pi-minus"></Button>
       <Button id="win_max" @click="onWinMaximize" variant="text" icon="fa-regular fa-square"></Button>
@@ -68,7 +78,7 @@ const openedFile = ref('')
 </template>
 
 <style scoped>
-.win_close{
+#win_close:hover{
   background-color: red;
 }
 </style>
