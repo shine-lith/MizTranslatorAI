@@ -124,8 +124,8 @@ app.on('window-all-closed', () => {
 
 ipcMain.on('dev:devFunction', () => {
   console.log('devFunction')
-
   notification('通知', '这是一个通知', null)
+  loadMizFile("/Users/lith/Dev/MizTranslatorAI/Cesar_Syria_[Helicoper_Combat_Rescue].miz")
 })
 
 ipcMain.on('titlebar:openFile', async () => {

@@ -74,7 +74,7 @@ function showPreference() {}
       <Button @click="showPreference" label="设置" icon="pi pi-cog" variant="text" />
       <Button @click="onDev" label="MAIN DEV" />
     </div>
-    <div id="apptitle" class="flex-auto m-6">{{ titleText }}</div>
+    <div id="apptitle" class="flex-auto m-6 truncate">{{ titleText }}</div>
     <div id="winctrl" class="flex-none">
       <Button id="win_min" @click="onWinMinimize" variant="text" icon="pi pi-minus"></Button>
       <Button
