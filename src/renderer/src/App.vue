@@ -1,11 +1,12 @@
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
-import Toast from 'primevue/toast'
-import { useToast } from 'primevue/usetoast'
-import Button from 'primevue/button'
 import TextList from './components/TextList.vue'
 import TitleBar from './components/TitleBar.vue'
-import { store } from './store.js'
+import TranslationAssistant from './components/TranslationAssistant.vue'
+import Button from 'primevue/button'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
+
 
 const toast = useToast()
 //const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
