@@ -7,55 +7,64 @@ defineProps({
   msg: String
 })
 
+defineExpose({
+  setTitle
+})
+
 const emit = defineEmits(['onSaveFile'])
 const titleText = ref('mizTranslator')
 
-watch (
-  () => store.mizFile,
-  (newVal, oldVal) => {
-    titleText.value = `mizTranslator - ${newVal}`
-  }
-)
-const onDev = () => {
+// watch (
+//   () => store.mizFile,
+//   (newVal, oldVal) => {
+//     titleText.value = `mizTranslator - ${newVal}`
+//   }
+// )
+
+function setTitle(title) {
+  titleText.value = title
+}
+
+function onDev(){
   window.api.onDevFunction()
 }
 
 // 打开文件
-const onOpenFile = () => {
+function onOpenFile() {
   window.api.onOpenFile()
 }
 
 // 保存文件
-const onSaveFile = () => {
+function onSaveFile() {
   emit('onSaveFile')
 }
 
 // 打包
-const onExportToMiz = () => {
+function onExportToMiz() {
   window.api.onExportToMiz()
 }
 
 // 最小化
-const onWinMinimize = () => {
+function onWinMinimize() {
   window.api.onWinMinimize()
 }
 
 // 最大化/恢复
-const onWinMaximize = () => {
+function onWinMaximize() {
   window.api.onWinMaximize()
 }
 
 // 关闭app
-const onWindowClose = () => {
+function onWindowClose() {
   window.api.onWinClose()
 }
 
 // 显示设置
-const showPreference = () => {
+function showPreference() {
   
 }
 
-const openedFile = ref('')
+
 </script>
 
 <template>

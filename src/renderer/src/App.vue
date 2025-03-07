@@ -9,7 +9,7 @@ import { store } from './store.js'
 
 const toast = useToast()
 //const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-
+const titleBarRef = ref();
 const projectPath = ref() // 项目路径
 
 window.electron.ipcRenderer.on('onNotification', (e, message, data) => {
@@ -22,6 +22,7 @@ window.electron.ipcRenderer.on('onMizOpen', (e, code, data) => {
     store.mizFile = data.mizFile
     store.projectPath = data.projectPath
     store.listdata = data.data
+    titleBarRef.value.setTitle(`mizTranslator - ${data.mizFile}`)
   }
 })
 
@@ -31,9 +32,8 @@ function onButton() {
 </script>
 
 <template>
-  <TitleBar />
+  <TitleBar ref="titleBarRef" />
   <Button label="Dev in Vue" @click="onButton" />
   <TextList />
   <Toast />
 </template>
-]
