@@ -3,10 +3,14 @@ import { ref } from 'vue'
 import TextList from './components/TextList.vue'
 import TitleBar from './components/TitleBar.vue'
 import TranslationAssistant from './components/TranslationAssistant.vue'
-import Button from 'primevue/button'
+
 import { store } from './store.js'
+
+import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
+import Splitter from 'primevue/splitter';
+import SplitterPanel from 'primevue/splitterpanel';
 
 
 const toast = useToast()
@@ -45,7 +49,16 @@ function onSaveFile() {
 </script>
 
 <template>
-  <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" />
-  <TextList />
+  <div class="flex flex-col h-screen">
+    <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" />
+    <Splitter class="grow" gutterSize="2" stateKey="main_side_splitter" stateStorage="local">
+      <SplitterPanel> 
+        <TextList />
+      </SplitterPanel>
+      <SplitterPanel class="">
+        <TranslationAssistant />
+      </SplitterPanel>
+    </Splitter>
   <Toast />
+  </div>
 </template>
