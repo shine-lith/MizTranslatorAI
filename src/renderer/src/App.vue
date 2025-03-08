@@ -49,16 +49,19 @@ function onSaveFile() {
 </script>
 
 <template>
-  <div class="flex flex-col h-screen">
+  <!-- <div class="z-0 absolute rounded-full bg-radial right-0 bottom-0 h-80 w-80 bg-linear-to-r from-cyan-500 to-blue-500 blur-[200px]"></div> -->
+  <div class="h-screen flex flex-col z-999">
     <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" />
-    <Splitter class="grow" gutterSize="2" stateKey="main_side_splitter" stateStorage="local">
-      <SplitterPanel> 
-        <TextList />
+    <div class="flex-1 flex overflow-hidden">
+    <Splitter class="flex-1 flex overflow-hidden" gutterSize="2" stateKey="main_side_splitter" stateStorage="local">
+      <SplitterPanel class="flex-1 overflow-y-auto"> 
+          <TextList />
       </SplitterPanel>
-      <SplitterPanel class="">
-        <TranslationAssistant />
+      <SplitterPanel class="flex-1 flex flex-col">
+          <TranslationAssistant />
       </SplitterPanel>
     </Splitter>
+  </div>
   <Toast />
   </div>
 </template>
