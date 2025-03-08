@@ -89,6 +89,14 @@ function showPreference() {}
 </template>
 
 <style scoped>
+#apptitle{
+  -webkit-app-region: drag;
+  cursor: default;
+  user-select: none;
+}
+#menu {
+  z-index: 999;
+}
 #win_close:hover {
   background-color: red;
 }

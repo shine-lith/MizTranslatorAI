@@ -50,6 +50,7 @@ function createWindow(): void {
   initDb()
 
   win = new BrowserWindow({
+    frame: false,
     width: 900,
     height: 670,
     show: false,
