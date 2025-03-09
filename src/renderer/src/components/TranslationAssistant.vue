@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+import ChatBubble from './ChatBubble.vue'
 
 const value = ref(null)
 const componentList = ref([])
@@ -10,9 +11,17 @@ const counter = ref(0)
 function sendMsg() {
   componentList.value.push({
     id: ++counter.value,
-    name: 'MyBubble', // 必须已注册
+    name: 'ChatBubble', // 必须已注册
     props: {
-      /* 传递的props */
+      type: 'send'
+    }
+  })
+
+  componentList.value.push({
+    id: ++counter.value,
+    name: 'ChatBubble', // 必须已注册
+    props: {
+      type: 'receive'
     }
   })
 }
@@ -51,9 +60,6 @@ function removeComponent(id) {
       v-bind="comp.props"
       @remove="removeComponent(comp.id)"
     />
-
-    <!-- 系统消息 -->
-    <div class="text-center text-sm text-gray-500 py-2">张三加入了聊天</div>
   </div>
   <div class="absolute bottom-0 p-4 w-full backdrop-blur-sm border-t border-gray-700 flex gap-2">
     <InputText class="border-none flex-1" placeholder="给LLM发送消息" aria-multiline />
