@@ -53,11 +53,11 @@ function onSaveFile() {
   <div class="h-screen flex flex-col z-999">
     <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" />
     <div class="flex-1 flex overflow-hidden">
-    <Splitter class="flex-1 flex overflow-hidden" gutterSize="2" stateKey="main_side_splitter" stateStorage="local">
+    <Splitter class="flex-1 flex overflow-hidden" gutterSize="1" stateKey="main_side_splitter" stateStorage="local">
       <SplitterPanel class="flex-1 overflow-y-auto"> 
           <TextList />
       </SplitterPanel>
-      <SplitterPanel class="flex-1 flex flex-col">
+      <SplitterPanel class="flex-1  relative">
           <TranslationAssistant />
       </SplitterPanel>
     </Splitter>
