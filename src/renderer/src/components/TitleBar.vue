@@ -89,7 +89,7 @@ function showPreference() {}
 </template>
 
 <style scoped>
-#apptitle{
+#apptitle {
   -webkit-app-region: drag;
   cursor: default;
   user-select: none;

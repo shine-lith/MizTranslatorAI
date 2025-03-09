@@ -9,9 +9,8 @@ import { store } from './store.js'
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
-import Splitter from 'primevue/splitter';
-import SplitterPanel from 'primevue/splitterpanel';
-
+import Splitter from 'primevue/splitter'
+import SplitterPanel from 'primevue/splitterpanel'
 
 const toast = useToast()
 //const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
@@ -53,15 +52,20 @@ function onSaveFile() {
   <div class="h-screen flex flex-col z-999">
     <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" />
     <div class="flex-1 flex overflow-hidden">
-    <Splitter class="flex-1 flex overflow-hidden" gutterSize="1" stateKey="main_side_splitter" stateStorage="local">
-      <SplitterPanel class="flex-1 overflow-y-auto"> 
+      <Splitter
+        class="flex-1 flex overflow-hidden"
+        gutterSize="1"
+        stateKey="main_side_splitter"
+        stateStorage="local"
+      >
+        <SplitterPanel class="flex-1 overflow-y-auto">
           <TextList />
-      </SplitterPanel>
-      <SplitterPanel class="flex-1  relative">
+        </SplitterPanel>
+        <SplitterPanel class="flex-1 relative">
           <TranslationAssistant />
-      </SplitterPanel>
-    </Splitter>
-  </div>
-  <Toast />
+        </SplitterPanel>
+      </Splitter>
+    </div>
+    <Toast />
   </div>
 </template>

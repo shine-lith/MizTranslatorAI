@@ -126,7 +126,7 @@ app.on('window-all-closed', () => {
 ipcMain.on('dev:devFunction', () => {
   console.log('devFunction')
   notification('通知', '这是一个通知', null)
-  loadMizFile("/Users/lith/Dev/MizTranslatorAI/Cesar_Syria_[Helicoper_Combat_Rescue].miz")
+  loadMizFile('/Users/lith/Dev/MizTranslatorAI/Cesar_Syria_[Helicoper_Combat_Rescue].miz')
 })
 
 ipcMain.on('titlebar:openFile', async () => {
@@ -143,15 +143,12 @@ ipcMain.on('close', (e) => {
   if (tranNeedSave) {
     e.preventDefault()
 
-    var response = dialog.showMessageBoxSync(
-      win,
-      {
-        title: APP_NAME,
-        message: '是否要保存翻译工程?',
-        buttons: ['保存', '不保存', '取消'],
-        cancelId: 2
-      }
-    )
+    var response = dialog.showMessageBoxSync(win, {
+      title: APP_NAME,
+      message: '是否要保存翻译工程?',
+      buttons: ['保存', '不保存', '取消'],
+      cancelId: 2
+    })
 
     switch (response) {
       case 0:
@@ -393,9 +390,7 @@ function cleanTranslateCache() {
     else return (bytes / 1073741824).toFixed(3) + 'GB'
   }
   var dbStat = fs.statSync(FILE_DB)
-  db.get('cache')
-    .remove()
-    .write()
+  db.get('cache').remove().write()
   notification('翻译缓存已清除', '释放 ' + bytetostring(dbStat.size) + ' 空间', null)
 }
 
@@ -403,7 +398,7 @@ function cleanTranslateCache() {
 ipcMain.on('window:minimize', () => win.minimize())
 
 //最大化
-ipcMain.on('window:maximize', function() {
+ipcMain.on('window:maximize', function () {
   if (win.isMaximized()) {
     win.restore()
   } else {
@@ -420,7 +415,7 @@ ipcMain.on('getSettings', (e, setid) => {
 // 复制文字到剪贴板
 ipcMain.on('textToClipboard', (e, text) => {
   clipboard.writeText(text)
-  notification('内容已复制','',null)
+  notification('内容已复制', '', null)
 })
 
 // 打开文件
@@ -438,9 +433,9 @@ ipcMain.on('onCloseAndSaveProject', (e, data) => {
 // 保存工程
 ipcMain.on('titlebar:saveFile', (e, data) => {
   var tranFilePath = saveTranFile(data)
-  notification('工程已保存', '<span class=\'action\'>点击此处打开保存位置</span>', {
+  notification('工程已保存', "<span class='action'>点击此处打开保存位置</span>", {
     method: 'openFolder',
-    args: tranFilePath,
+    args: tranFilePath
   })
   tranNeedSave = false
 })
@@ -450,9 +445,9 @@ ipcMain.on('exportToMiz', (e, d) => {
   const DCS_DICT_STR_BR = '\\\n'
 
   // 将文本转换为DCS Dict的格式
-  var toDcsDictStr = function(str) {
-    var str = str.replace(new RegExp('\n', 'gm'), DCS_DICT_STR_BR); // 过滤换行 把换行转为 \
-    str = str.replace(new RegExp('"', 'gm'), '\\"'); // 过滤 双引号
+  var toDcsDictStr = function (str) {
+    var str = str.replace(new RegExp('\n', 'gm'), DCS_DICT_STR_BR) // 过滤换行 把换行转为 \
+    str = str.replace(new RegExp('"', 'gm'), '\\"') // 过滤 双引号
     return str
   }
 
@@ -477,8 +472,8 @@ ipcMain.on('exportToMiz', (e, d) => {
   // }
 
   // var exportMiz = async function(mizFile, exportMizFile, dataTable) {
-    // var dictionaryContent = buildDcsDictionaryContent(dataTable)
-    // 往副本中添加翻译文件
+  // var dictionaryContent = buildDcsDictionaryContent(dataTable)
+  // 往副本中添加翻译文件
   //   fs.readFile(mizFile, (err, data) => {
   //     var zip = new JSzip()
   //     zip.loadAsync(data).then(
@@ -519,7 +514,7 @@ ipcMain.on('exportToMiz', (e, d) => {
   //       defaultPath: projectFileNameBase + '_CN.miz',
   //       filters: [{ name: 'DCS World 任务', extensions: ['miz'] }],
   //     })
-    
+
   //     if (!canceled) {
   //       exportMiz(mizFile, filePath, data)
   //     }
@@ -527,7 +522,7 @@ ipcMain.on('exportToMiz', (e, d) => {
   // } else {
   //   notification('打包失败，原文件不存在!', '', null)
   //   debugInfo('mizFile not exist')
-  // } 
+  // }
 })
 
 // 存在新的修改
