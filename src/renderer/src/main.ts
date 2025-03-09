@@ -6,6 +6,7 @@ import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura'
 import { definePreset } from '@primeuix/themes'
 import ToastService from 'primevue/toastservice'
+import MyBubble from './components/MyBubble.vue'
 
 const MyPreset = definePreset(Aura, {
   components: {
@@ -30,4 +31,5 @@ app.use(PrimeVue, {
     }
   }
 })
+app.component('MyBubble', MyBubble)
 app.mount('#app')
