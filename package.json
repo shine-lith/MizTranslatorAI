@@ -26,6 +26,7 @@
     "lowdb": "1.0.0",
     "luaparse": "^0.3.1",
     "md5": "^2.3.0",
+    "ollama": "^0.5.14",
     "primeicons": "^7.0.0",
     "primevue": "^4.3.1",
     "tailwindcss": "^4.0.9",

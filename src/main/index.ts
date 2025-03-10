@@ -5,6 +5,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import yauzl from 'yauzl'
+import { translateService } from "./translate-service";
+
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
 const luaparse = require('luaparse')
@@ -48,6 +50,7 @@ var db = low(dbAdapter)
 function createWindow(): void {
   // 设置Menu
   initDb()
+  translateService.setCacheDb(db);
 
   win = new BrowserWindow({
     frame: false,
@@ -125,8 +128,26 @@ app.on('window-all-closed', () => {
 
 ipcMain.on('dev:devFunction', () => {
   console.log('devFunction')
-  notification('通知', '这是一个通知', null)
-  loadMizFile('/Users/lith/Dev/MizTranslatorAI/Cesar_Syria_[Helicoper_Combat_Rescue].miz')
+  // notification('通知', '这是一个通知', null)
+  // loadMizFile('/Users/lith/Dev/MizTranslatorAI/Cesar_Syria_[Helicoper_Combat_Rescue].miz')
+
+
+  translateService.translate(
+    ["ollama"],
+    "aaa",
+    "你好",
+    (source, work, result) => {
+      console.log('reulst');
+      win.webContents.send("onTranslation", 200, {
+        source: source,
+        request: work,
+        response: result,
+      });
+    },
+    false,
+    null
+  );
+
 })
 
 ipcMain.on('titlebar:openFile', async () => {
@@ -556,3 +577,27 @@ ipcMain.on('saveSetting', (e, data) => {
   }
   saveSettings(data.key, value)
 })
+
+
+// 翻译文字
+ipcMain.on("translation", (e, data) => {
+  if (data.source.length > 0) {
+    translateService.translate(
+      data.source,
+      data.id,
+      data.text,
+      (source, work, result) => {
+        win.webContents.send("onTranslation", 200, {
+          source: source,
+          request: work,
+          response: result,
+        });
+      },
+      false,
+      data.store
+    );
+  } else {
+    notification("无法加载翻译", "请在偏好设置中启用一个翻译来源", null);
+    win.webContents.send("onTranslation", 400);
+  }
+});
