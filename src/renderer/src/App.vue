@@ -57,11 +57,12 @@ function onSaveFile() {
         gutterSize="1"
         stateKey="main_side_splitter"
         stateStorage="local"
+        layout="vertical"
       >
         <SplitterPanel class="flex-1 overflow-y-auto">
           <TextList />
         </SplitterPanel>
-        <SplitterPanel class="flex-1 relative">
+        <SplitterPanel class="flex-1 flex flex-col">
           <TranslationAssistant />
         </SplitterPanel>
       </Splitter>

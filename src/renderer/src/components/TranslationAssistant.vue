@@ -33,13 +33,13 @@ function removeComponent(id) {
 
 <template>
   <!-- 顶部导航 -->
-  <div class="p-4 absolute top-0 w-full backdrop-blur-sm border-b border-gray-700">
+  <div class="p-2 top-0 w-full backdrop-blur-sm border-b border-gray-700">
     <div class="flex items-center">
-      <div class="flex-1">
-        <h1 class="font-semibold text-xl">LLM辅助</h1>
-        <p class="text-sm text-gray-200">Ollama - DeepSeek-r1:32b</p>
+      <div class="flex-1 flex gap-2">
+        <h1 class="font-semibold text-sm">LLM交互</h1>
+        <p class="text-sm">Ollama - DeepSeek-r1:32b</p>
       </div>
-      <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white">
+      <div class="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
@@ -52,7 +52,7 @@ function removeComponent(id) {
     </div>
   </div>
 
-  <div class="h-full grid overflow-y-auto pt-30 pb-50 pl-5 pr-5 gap-4">
+  <div class="h-full grid overflow-y-auto pl-0 pr-0 gap-2">
     <component
       v-for="comp in componentList"
       :is="comp.name"
@@ -61,7 +61,7 @@ function removeComponent(id) {
       @remove="removeComponent(comp.id)"
     />
   </div>
-  <div class="absolute bottom-0 p-4 w-full backdrop-blur-sm border-t border-gray-700 flex gap-2">
+  <div class="p-1 w-full backdrop-blur-sm border-t border-gray-700 flex gap-2">
     <InputText class="border-none flex-1" placeholder="给LLM发送消息" aria-multiline />
     <Button
       @click="sendMsg"

@@ -36,31 +36,30 @@ const handleResend = () => {
     <!-- 用户发送的消息 -->
     <div v-if="type === 'send'">
       <div
-        class="fly-in flex items-start gap-3 justify-end"
+        class="fly-in flex items-start text-sm "
         @mouseenter="isHovering = true"
         @mouseleave="isHovering = false"
       >
-        <!-- 重发按钮 -->
-        <button v-show="isHovering" @click="handleResend" class="my-auto">↻</button>
         <!-- 气泡 -->
-        <div class="max-w-[70%]">
-          <div class="bg-blue-500 text-white p-3 rounded-lg">
-            <p>{{ message }}</p>
-            <span class="text-xs text-blue-200 mt-1 block">{{ dictkey }}</span>
+        <div class="">
+          <div class="">
+            <p>> {{ message }}</p>
           </div>
         </div>
+        <!-- 重发按钮 -->
+        <button v-show="isHovering" @click="handleResend" class="my-auto">↻</button>
       </div>
     </div>
 
     <!-- 返回的消息 -->
     <div v-else-if="type === 'receive'">
-      <div class="flex items-start gap-3">
+      <div class="flex items-start text-sm">
         <div class="max-w-[100%]">
-          <div class="p-3 rounded-lg shadow-sm">
+          <div class="">
             <p>
-              消息部分，每条消息应该用flex布局，根据发送者决定flex-row或flex-row-reverse。时间戳要小字，灰色，放在消息气泡下方。头像或用户图标可能用圆形的div，显示用户名的首字母，比如对方用A，自己用B。
+              美国黑鹰直升机队在25日午夜2点左右——比布罗布鲁战役之前一周的夜晚，执行巡逻任务时被…型号为 courage 53）。军方黑鹰直升机队在此次行动中至少有一架受损后返回了基地。
             </p>
-            <span class="text-xs text-gray-400 mt-1 block">Dickkey-122</span>
+            <span class="text-xs mt-1 block">Dickkey-122</span>
           </div>
         </div>
       </div>
