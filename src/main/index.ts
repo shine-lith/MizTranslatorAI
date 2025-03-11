@@ -6,6 +6,7 @@ import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import yauzl from 'yauzl'
 import { translateService } from "./translate-service";
+import { TranslateOllama } from "./translate-ollama";
 
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
@@ -131,22 +132,28 @@ ipcMain.on('dev:devFunction', () => {
   // notification('通知', '这是一个通知', null)
   // loadMizFile('/Users/lith/Dev/MizTranslatorAI/Cesar_Syria_[Helicoper_Combat_Rescue].miz')
 
+  var ollama_api = new TranslateOllama()
+  ollama_api.translate('Army Black Hawk helicopters, damaging at least one that managed to return to base. Then, at 2 a.m. on 25 September—a week before the Battle of Mogadishu—the SNA used an RPG to shoot down a Black Hawk (callsign Courage 53) while it was on patrol.').then((result)=>{
+    console.log(result)
+  }).catch((error)=>{
 
-  translateService.translate(
-    ["ollama"],
-    "aaa",
-    "你好",
-    (source, work, result) => {
-      console.log('reulst');
-      win.webContents.send("onTranslation", 200, {
-        source: source,
-        request: work,
-        response: result,
-      });
-    },
-    false,
-    null
-  );
+  })
+
+  // translateService.translate(
+  //   ["ollama"],
+  //   "aaa",
+  //   "你好",
+  //   (source, work, result) => {
+  //     console.log('reulst');
+  //     win.webContents.send("onTranslation", 200, {
+  //       source: source,
+  //       request: work,
+  //       response: result,
+  //     });
+  //   },
+  //   false,
+  //   null
+  // );
 
 })
 
