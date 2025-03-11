@@ -139,6 +139,39 @@ ipcMain.on('dev:devFunction', () => {
 
   })
 
+// 初始化带配置的实例
+const translator = new TranslateOllama({
+  host: 'http://new.host:11434',
+  model: 'military-translator-v2',
+  timeout: 60000,
+  maxRetries: 5
+})
+
+// 标准翻译（带缓存）
+const result = await translator.translate('Tactical maneuver guidelines')
+console.log(result)
+
+// 流式翻译（不使用缓存）
+const stream = translator.translateStream('Field medical procedures', { skipCache: true })
+for await (const chunk of stream) {
+  console.log('Partial:', chunk.partial)
+}
+
+// 强制刷新缓存
+translator.deleteCache('Obsolete protocol')
+translator.clearCache()
+
+// 错误处理示例
+try {
+  await translator.translate('')
+} catch (error) {
+  console.error('Error:', error)
+  if (error.message.includes('timeout')) {
+    // 处理超时错误
+  }
+}
+
+
   // translateService.translate(
   //   ["ollama"],
   //   "aaa",
