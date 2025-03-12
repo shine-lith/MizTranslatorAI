@@ -5,8 +5,6 @@ const DEFAULT_CONFIG = {
   host: 'http://127.0.0.1:11434',
   model: 'deepseek-r1:7b',
   maxRetries: 3,         // 默认最大重试次数
-  cacheMax: 100,         // 默认缓存100条结果
-  cacheTTL: 60 * 60_000, // 默认缓存1小时
   temperature: 0.3,
   keepAlive: '3m'
 }
@@ -22,29 +20,8 @@ class TranslateOllama {
     })
   }
 
-
-  // 带缓存的请求处理
-  async #cachedRequest(text, options = {}) {
-    
-    // 检查缓存
-    if (!options.skipCache && this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey)
-    }
-    
-    // 执行实际请求
-    const result = await this.#executeRequest(text, options)
-    
-    // 缓存结果
-    if (!options.skipCache) {
-      this.cache.set(cacheKey, result)
-    }
-    
-    return result
-  }
-
   // 带重试和超时的请求核心方法
   async #executeRequest(text, options) {
-    const controller = new AbortController()
     try {
       return await retry(
         async (bail) => {
@@ -85,7 +62,7 @@ class TranslateOllama {
   // 标准翻译方法
   async translate(text, options = {}) {
     try {
-      const response = await this.#cachedRequest(text, options)
+      const response = await this.#executeRequest(text, options)
       return this.#parseResult(text, response)
     } catch (error) {
       throw new Error(`Translation failed: ${error.message}`)
@@ -119,7 +96,6 @@ class TranslateOllama {
       raw: response.message,
       text: text,
       result: resultText,
-      cached: response.cached || false
     }
   }
 

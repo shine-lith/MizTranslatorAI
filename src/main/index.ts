@@ -132,45 +132,24 @@ ipcMain.on('dev:devFunction', () => {
   // notification('通知', '这是一个通知', null)
   // loadMizFile('/Users/lith/Dev/MizTranslatorAI/Cesar_Syria_[Helicoper_Combat_Rescue].miz')
 
-  var ollama_api = new TranslateOllama()
-  ollama_api.translate('Army Black Hawk helicopters, damaging at least one that managed to return to base. Then, at 2 a.m. on 25 September—a week before the Battle of Mogadishu—the SNA used an RPG to shoot down a Black Hawk (callsign Courage 53) while it was on patrol.').then((result)=>{
-    console.log(result)
-  }).catch((error)=>{
-
-  })
 
 // 初始化带配置的实例
 const translator = new TranslateOllama({
-  host: 'http://new.host:11434',
-  model: 'military-translator-v2',
-  timeout: 60000,
+  host: 'http://127.0.0.1:11434',
+  model: 'deepseek-r1:7b',
   maxRetries: 5
 })
 
-// 标准翻译（带缓存）
-const result = await translator.translate('Tactical maneuver guidelines')
-console.log(result)
 
-// 流式翻译（不使用缓存）
-const stream = translator.translateStream('Field medical procedures', { skipCache: true })
-for await (const chunk of stream) {
-  console.log('Partial:', chunk.partial)
-}
-
-// 强制刷新缓存
-translator.deleteCache('Obsolete protocol')
-translator.clearCache()
-
-// 错误处理示例
-try {
-  await translator.translate('')
-} catch (error) {
-  console.error('Error:', error)
-  if (error.message.includes('timeout')) {
-    // 处理超时错误
+const t = async ()=>{
+  var originText = 'Army Black Hawk helicopters, damaging at least one that managed to return to base. Then, at 2 a.m. on 25 September—a week before the Battle of Mogadishu—the SNA used an RPG to shoot down a Black Hawk (callsign Courage 53) while it was on patrol.'
+  // 流式翻译（不使用缓存）
+  const stream = translator.translateStream(originText, { skipCache: true })
+  for await (const chunk of stream) {
+    console.log('Partial:', chunk.partial)
   }
 }
-
+t()
 
   // translateService.translate(
   //   ["ollama"],
