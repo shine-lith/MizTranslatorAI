@@ -10,7 +10,8 @@ const api = {
   onWinClose: () => ipcRenderer.send('window:close'),
   onOpenFile: () => ipcRenderer.send('titlebar:openFile'),
   onSaveFile: (listdata) => ipcRenderer.send('titlebar:saveFile', listdata),
-  onExportToMiz: () => ipcRenderer.send('titlebar:exportToMiz')
+  onExportToMiz: () => ipcRenderer.send('titlebar:exportToMiz'),
+  translate: (data) => ipcRenderer.invoke('translate:single', data),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

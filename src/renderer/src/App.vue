@@ -45,6 +45,14 @@ function onSaveFile() {
     window.api.onSaveFile(JSON.stringify(store.listdata))
   }
 }
+
+async function onLineSend(data) {
+  const result = await window.api.translate({
+    key: data.key,
+    originText: data.originText,
+  });
+  data.translateText = result
+}
 </script>
 
 <template>
@@ -60,7 +68,7 @@ function onSaveFile() {
         layout="vertical"
       >
         <SplitterPanel class="flex-1 overflow-y-auto">
-          <TextList />
+          <TextList @onLineSend="onLineSend"/>
         </SplitterPanel>
         <SplitterPanel class="flex-1 flex flex-col">
           <TranslationAssistant />

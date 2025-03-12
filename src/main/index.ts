@@ -126,6 +126,18 @@ app.on('window-all-closed', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+ipcMain.handle('translate:single', async (e, data)=> {
+
+  const translator = new TranslateOllama({
+    host: 'http://127.0.0.1:11434',
+    model: 'deepseek-r1:7b',
+    maxRetries: 5
+  })
+
+  const result = await translator.translate(data.originText)
+  return result.result
+  return "OK"
+})
 
 ipcMain.on('dev:devFunction', () => {
   console.log('devFunction')
