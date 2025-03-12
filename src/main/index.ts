@@ -5,8 +5,8 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import fs from 'fs'
 import yauzl from 'yauzl'
-import { translateService } from "./translate-service";
-import { TranslateOllama } from "./translate-ollama";
+import { translateService } from './translate-service'
+import { TranslateOllama } from './translate-ollama'
 
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
@@ -51,7 +51,7 @@ var db = low(dbAdapter)
 function createWindow(): void {
   // 设置Menu
   initDb()
-  translateService.setCacheDb(db);
+  translateService.setCacheDb(db)
 
   win = new BrowserWindow({
     frame: false,
@@ -132,24 +132,23 @@ ipcMain.on('dev:devFunction', () => {
   // notification('通知', '这是一个通知', null)
   // loadMizFile('/Users/lith/Dev/MizTranslatorAI/Cesar_Syria_[Helicoper_Combat_Rescue].miz')
 
+  // 初始化带配置的实例
+  const translator = new TranslateOllama({
+    host: 'http://127.0.0.1:11434',
+    model: 'deepseek-r1:7b',
+    maxRetries: 5
+  })
 
-// 初始化带配置的实例
-const translator = new TranslateOllama({
-  host: 'http://127.0.0.1:11434',
-  model: 'deepseek-r1:7b',
-  maxRetries: 5
-})
-
-
-const t = async ()=>{
-  var originText = 'Army Black Hawk helicopters, damaging at least one that managed to return to base. Then, at 2 a.m. on 25 September—a week before the Battle of Mogadishu—the SNA used an RPG to shoot down a Black Hawk (callsign Courage 53) while it was on patrol.'
-  // 流式翻译（不使用缓存）
-  const stream = translator.translateStream(originText, { skipCache: true })
-  for await (const chunk of stream) {
-    console.log('Partial:', chunk.partial)
+  const t = async () => {
+    var originText =
+      'Army Black Hawk helicopters, damaging at least one that managed to return to base. Then, at 2 a.m. on 25 September—a week before the Battle of Mogadishu—the SNA used an RPG to shoot down a Black Hawk (callsign Courage 53) while it was on patrol.'
+    // 流式翻译（不使用缓存）
+    const stream = translator.translateStream(originText, { skipCache: true })
+    for await (const chunk of stream) {
+      console.log('Partial:', chunk.partial)
+    }
   }
-}
-t()
+  t()
 
   // translateService.translate(
   //   ["ollama"],
@@ -166,7 +165,6 @@ t()
   //   false,
   //   null
   // );
-
 })
 
 ipcMain.on('titlebar:openFile', async () => {
@@ -597,26 +595,25 @@ ipcMain.on('saveSetting', (e, data) => {
   saveSettings(data.key, value)
 })
 
-
 // 翻译文字
-ipcMain.on("translation", (e, data) => {
+ipcMain.on('translation', (e, data) => {
   if (data.source.length > 0) {
     translateService.translate(
       data.source,
       data.id,
       data.text,
       (source, work, result) => {
-        win.webContents.send("onTranslation", 200, {
+        win.webContents.send('onTranslation', 200, {
           source: source,
           request: work,
-          response: result,
-        });
+          response: result
+        })
       },
       false,
       data.store
-    );
+    )
   } else {
-    notification("无法加载翻译", "请在偏好设置中启用一个翻译来源", null);
-    win.webContents.send("onTranslation", 400);
+    notification('无法加载翻译', '请在偏好设置中启用一个翻译来源', null)
+    win.webContents.send('onTranslation', 400)
   }
-});
+})

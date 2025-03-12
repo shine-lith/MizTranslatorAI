@@ -36,7 +36,7 @@ const handleResend = () => {
     <!-- 用户发送的消息 -->
     <div v-if="type === 'send'">
       <div
-        class="fly-in flex items-start text-sm "
+        class="fly-in flex items-start text-sm"
         @mouseenter="isHovering = true"
         @mouseleave="isHovering = false"
       >
@@ -57,7 +57,8 @@ const handleResend = () => {
         <div class="max-w-[100%]">
           <div class="">
             <p>
-              美国黑鹰直升机队在25日午夜2点左右——比布罗布鲁战役之前一周的夜晚，执行巡逻任务时被…型号为 courage 53）。军方黑鹰直升机队在此次行动中至少有一架受损后返回了基地。
+              美国黑鹰直升机队在25日午夜2点左右——比布罗布鲁战役之前一周的夜晚，执行巡逻任务时被…型号为
+              courage 53）。军方黑鹰直升机队在此次行动中至少有一架受损后返回了基地。
             </p>
             <span class="text-xs mt-1 block">Dickkey-122</span>
           </div>

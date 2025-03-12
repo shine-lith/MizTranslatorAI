@@ -4,7 +4,7 @@ import retry from 'async-retry'
 const DEFAULT_CONFIG = {
   host: 'http://127.0.0.1:11434',
   model: 'deepseek-r1:7b',
-  maxRetries: 3,         // 默认最大重试次数
+  maxRetries: 3, // 默认最大重试次数
   temperature: 0.3,
   keepAlive: '3m'
 }
@@ -13,10 +13,10 @@ class TranslateOllama {
   constructor(config = {}) {
     // 合并配置
     this.config = { ...DEFAULT_CONFIG, ...config }
-    
+
     // 初始化Ollama实例
-    this.ollama = new Ollama({ 
-      host: this.config.host 
+    this.ollama = new Ollama({
+      host: this.config.host
     })
   }
 
@@ -31,7 +31,8 @@ class TranslateOllama {
               messages: [
                 {
                   role: 'system',
-                  content: '你是一名专业翻译，具有军事专业知识，严格遵守要求。将用户的文本翻译成中文，保持原意，无需解释。'
+                  content:
+                    '你是一名专业翻译，具有军事专业知识，严格遵守要求。将用户的文本翻译成中文，保持原意，无需解释。'
                 },
                 { role: 'user', content: text }
               ],
@@ -39,11 +40,11 @@ class TranslateOllama {
               options: {
                 temperature: this.config.temperature
               },
-              stream: options.stream,
+              stream: options.stream
             })
             return response
           } catch (error) {
-              //bail(error) 不重试直接退出
+            //bail(error) 不重试直接退出
             throw error
           }
         },
@@ -55,7 +56,6 @@ class TranslateOllama {
         }
       )
     } finally {
-     
     }
   }
 
@@ -73,7 +73,7 @@ class TranslateOllama {
   async *translateStream(text, options = {}) {
     try {
       const response = await this.#executeRequest(text, { ...options, stream: true })
-      
+
       for await (const chunk of response) {
         if (chunk.message?.content) {
           yield this.#parseChunk(chunk)
@@ -86,16 +86,13 @@ class TranslateOllama {
 
   // 解析结果
   #parseResult(text, response) {
-    const resultText = response.message.content.replace(
-      /<think\b[^>]*>[\s\S]*?<\/think>/g, 
-      ''
-    )
+    const resultText = response.message.content.replace(/<think\b[^>]*>[\s\S]*?<\/think>/g, '')
 
     return {
       from: response.model,
       raw: response.message,
       text: text,
-      result: resultText,
+      result: resultText
     }
   }
 
@@ -106,7 +103,6 @@ class TranslateOllama {
       done: chunk.done || false
     }
   }
-
 }
 
 export { TranslateOllama }
