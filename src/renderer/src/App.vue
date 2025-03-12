@@ -47,11 +47,6 @@ function onSaveFile() {
 }
 
 async function onLineSend(data) {
-  const result = await window.api.translate({
-    key: data.key,
-    originText: data.originText,
-  });
-  data.translateText = result
 }
 </script>
 
@@ -69,6 +64,7 @@ async function onLineSend(data) {
       >
         <SplitterPanel class="flex-1 overflow-y-auto">
           <TextList @onLineSend="onLineSend"/>
+          <Ai />
         </SplitterPanel>
         <SplitterPanel class="flex-1 flex flex-col">
           <TranslationAssistant />
