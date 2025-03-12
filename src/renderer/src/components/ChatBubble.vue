@@ -34,14 +34,14 @@ const handleResend = () => {
 <template>
   <transition name="fly-in" appear>
     <!-- 用户发送的消息 -->
-    <div v-if="type === 'send'">
+    <div v-if="type === 'user'">
       <div
         class="fly-in flex items-start text-sm"
         @mouseenter="isHovering = true"
         @mouseleave="isHovering = false"
       >
         <!-- 气泡 -->
-        <div class="">
+        <div class="max-w-[90%]">
           <div class="">
             <p>> {{ message }}</p>
           </div>
@@ -77,7 +77,7 @@ const handleResend = () => {
 /* 定义关键帧动画 */
 @keyframes flyIn {
   from {
-    transform: translateY(50px);
+    transform: translateX(-50px);
     opacity: 0;
   }
   to {

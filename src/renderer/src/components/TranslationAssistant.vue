@@ -4,16 +4,31 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import ChatBubble from './ChatBubble.vue'
 
+defineExpose({
+  addUserLine
+})
+
 const value = ref(null)
 const componentList = ref([])
 const counter = ref(0)
+
+function addUserLine(text){
+  componentList.value.push({
+    id: ++counter.value,
+    name: 'ChatBubble', // 必须已注册
+    props: {
+      type: 'user',
+      message: text
+    }
+  })
+}
 
 function sendMsg() {
   componentList.value.push({
     id: ++counter.value,
     name: 'ChatBubble', // 必须已注册
     props: {
-      type: 'send'
+      type: 'user'
     }
   })
 
@@ -52,7 +67,7 @@ function removeComponent(id) {
     </div>
   </div>
 
-  <div class="h-full grid overflow-y-auto pl-0 pr-0 gap-2">
+  <div class="h-full overflow-y-auto pl-0 pr-0 gap-2">
     <component
       v-for="comp in componentList"
       :is="comp.name"

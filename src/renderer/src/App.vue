@@ -15,6 +15,8 @@ import SplitterPanel from 'primevue/splitterpanel'
 const toast = useToast()
 //const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 const titleBarRef = ref()
+const textlistRef = ref()
+const chatRef = ref()
 const projectPath = ref() // 项目路径
 
 window.electron.ipcRenderer.on('onNotification', (e, message, data) => {
@@ -46,7 +48,9 @@ function onSaveFile() {
   }
 }
 
-async function onLineSend(data) {
+function onLineSend(data) {
+  chatRef.value.addUserLine(data.originText)
+  
 }
 </script>
 
@@ -63,11 +67,10 @@ async function onLineSend(data) {
         layout="vertical"
       >
         <SplitterPanel class="flex-1 overflow-y-auto">
-          <TextList @onLineSend="onLineSend"/>
-          <Ai />
+          <TextList ref="textlistRef" @onLineSend="onLineSend"/>
         </SplitterPanel>
         <SplitterPanel class="flex-1 flex flex-col">
-          <TranslationAssistant />
+          <TranslationAssistant ref="chatRef" />
         </SplitterPanel>
       </Splitter>
     </div>
