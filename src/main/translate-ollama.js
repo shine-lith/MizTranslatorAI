@@ -73,11 +73,12 @@ class TranslateOllama {
   async *translateStream(text, options = {}) {
     try {
       const response = await this.#executeRequest(text, { ...options, stream: true })
-
+      
       for await (const chunk of response) {
-        if (chunk.message?.content) {
+        console.log(chunk)
+        // if (chunk.message?.content) {
           yield this.#parseChunk(chunk)
-        }
+        // }
       }
     } catch (error) {
       throw new Error(`Stream translation failed: ${error.message}`)
@@ -104,7 +105,7 @@ class TranslateOllama {
 
   // 解析结果
   #parseResult(text, response) {
-    const resultText = response.message.content.replace(/<think\b[^>]*>[\s\S]*?<\/think>/g, '')
+    const resultText = response.message.content//.replace(/<think\b[^>]*>[\s\S]*?<\/think>/g, '')
 
     return {
       from: response.model,
