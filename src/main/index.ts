@@ -397,8 +397,8 @@ function loadLua(fileContent) {
   var listData = Array()
   events.on('TableKey', function (node) {
     var temp = {
-      key: node.key.raw,
-      originText: node.value.raw
+      key: node.key.value,
+      originText: node.value.value
     }
     listData.push(temp)
   })
