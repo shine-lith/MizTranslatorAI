@@ -5,38 +5,38 @@ import Button from 'primevue/button'
 import ChatBubble from './ChatBubble.vue'
 
 defineExpose({
-  addUserLine
+  addUserLine,
+  addAssistantLine
 })
 
 const value = ref(null)
 const componentList = ref([])
 const counter = ref(0)
 
-function addUserLine(text){
+// 添加用户输入行
+function addUserLine(question_id, dictkey, text){
   componentList.value.push({
     id: ++counter.value,
     name: 'ChatBubble', // 必须已注册
     props: {
       type: 'user',
-      message: text
+      message: text,
+      dictkey: dictkey,
+      question_id: question_id 
     }
   })
 }
 
-function sendMsg() {
+// 添加LLM的反馈行
+function addAssistantLine(question_id, dictkey) {
   componentList.value.push({
     id: ++counter.value,
     name: 'ChatBubble', // 必须已注册
     props: {
-      type: 'user'
-    }
-  })
-
-  componentList.value.push({
-    id: ++counter.value,
-    name: 'ChatBubble', // 必须已注册
-    props: {
-      type: 'receive'
+      dictkey: dictkey,
+      type: 'assistant',
+      message: '',
+      question_id: question_id
     }
   })
 }
@@ -44,6 +44,14 @@ function sendMsg() {
 function removeComponent(id) {
   componentList.value = componentList.value.filter((comp) => comp.id !== id)
 }
+
+// 监听翻译的流
+window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
+  var com = componentList.value.find((comp)=> comp.props.type == 'assistant' && comp.props.question_id == data.question_id)
+  if (com) 
+    com.props.message += data.chunk
+})
+
 </script>
 
 <template>
@@ -79,7 +87,7 @@ function removeComponent(id) {
   <div class="p-1 w-full backdrop-blur-sm border-t border-gray-700 flex gap-2">
     <InputText class="border-none flex-1" placeholder="给LLM发送消息" aria-multiline />
     <Button
-      @click="sendMsg"
+      @click=""
       class="ml-4"
       aria-multiline
       rounded

@@ -11,7 +11,8 @@ const api = {
   onOpenFile: () => ipcRenderer.send('titlebar:openFile'),
   onSaveFile: (listdata) => ipcRenderer.send('titlebar:saveFile', listdata),
   onExportToMiz: () => ipcRenderer.send('titlebar:exportToMiz'),
-  translate: (data) => ipcRenderer.invoke('translate:single', data),
+  translateSingle: (data) => ipcRenderer.invoke('translate:single', data),
+  translateChunk: (data) => ipcRenderer.send('translate:chunk', data)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

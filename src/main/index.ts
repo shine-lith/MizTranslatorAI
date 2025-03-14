@@ -137,13 +137,33 @@ app.on('window-all-closed', () => {
 ipcMain.handle('translate:single', async (e, data)=> {
 
   const translator = new TranslateOllama({
-    host: 'http://127.0.0.1:11434',
-    model: 'deepseek-r1:7b',
-    maxRetries: 1
+    host: 'http://192.168.1.12:11434',
+    model: 'deepseek-r1:32b',
+    maxRetries: 3
   })
 
   const result = await translator.translate(data.originText)
   return result.result
+})
+
+ipcMain.on('translate:chunk', async (e, data) => {
+  const translator = new TranslateOllama({
+    host: 'http://192.168.1.12:11434',
+    model: 'deepseek-r1:32b',
+    maxRetries: 3
+  })
+
+  const stream = translator.translateStreamFake(data.originText)
+  for await (const chunk of stream) {
+    console.log('Partial:', chunk.partial)
+
+    var result = { ...data, ...{
+      done: chunk.done,
+      chunk: chunk.partial
+    } }
+
+    win.webContents.send('onTranslateChunk', result)
+  }
 })
 
 ipcMain.on('dev:devFunction', () => {

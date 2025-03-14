@@ -3,22 +3,20 @@ import { ref } from 'vue'
 
 const props = defineProps({
   type: {
-    type: Number,
+    type: String,
     required: true
   },
   message: {
     type: String,
-    default: 'Welcome to Syria, Battle Angel!',
-    required: true
+    default: '',
   },
   dictkey: {
     type: String,
-    default: 'DictKey-1000',
     required: true
   },
-  timestamp: {
+  question_id: {
     type: String,
-    default: '刚刚'
+    required: true
   }
 })
 
@@ -29,6 +27,7 @@ const isHovering = ref(false)
 const handleResend = () => {
   emit('resend', props.message)
 }
+
 </script>
 
 <template>
@@ -52,15 +51,12 @@ const handleResend = () => {
     </div>
 
     <!-- 返回的消息 -->
-    <div v-else-if="type === 'receive'">
+    <div v-else-if="type === 'assistant'">
       <div class="flex items-start text-sm">
         <div class="max-w-[100%]">
           <div class="">
-            <p>
-              美国黑鹰直升机队在25日午夜2点左右——比布罗布鲁战役之前一周的夜晚，执行巡逻任务时被…型号为
-              courage 53）。军方黑鹰直升机队在此次行动中至少有一架受损后返回了基地。
-            </p>
-            <span class="text-xs mt-1 block">Dickkey-122</span>
+            <p v-if="message ===''">正在等待LLM回复</p>
+            <p v-else>{{ message }}</p>
           </div>
         </div>
       </div>

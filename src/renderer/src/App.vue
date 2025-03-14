@@ -49,8 +49,26 @@ function onSaveFile() {
 }
 
 function onLineSend(data) {
-  chatRef.value.addUserLine(data.originText)
+  var question_id = Date.now() + Math.random().toString(36).substring(2);
+  chatRef.value.addUserLine(question_id, data.key, data.originText)
+  chatRef.value.addAssistantLine(question_id, data.key)
   
+  window.api.translateChunk({
+    question_id: question_id,
+    key: data.key,
+    originText: data.originText
+  })
+
+
+  // window.api.translateSingle({
+  //   key: data.key,
+  //   originText: data.originText,
+  // }).then((result)=>{
+  //   loadingStates.value[index] = false;
+  //   data.translateText = result
+  // }).catch((err)=>{
+  //   loadingStates.value[index] = false;
+  // });
 }
 </script>
 
@@ -61,7 +79,6 @@ function onLineSend(data) {
     <div class="flex-1 flex overflow-hidden">
       <Splitter
         class="flex-1 flex overflow-hidden"
-        gutterSize="1"
         stateKey="main_side_splitter"
         stateStorage="local"
         layout="vertical"

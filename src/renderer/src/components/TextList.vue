@@ -20,21 +20,15 @@ function onRowUnselect(event) {
 
 async function onLineSendButton(data, index){
   emit('onLineSend', data)
-  if (loadingStates.value[index]) return
-  loadingStates.value[index] = true
-
-  window.api.translate({
-    key: data.key,
-    originText: data.originText,
-  }).then((result)=>{
-    loadingStates.value[index] = false;
-    data.translateText = result
-  }).catch((err)=>{
-    loadingStates.value[index] = false;
-  });
-
-  console.log()
+  if (loadingStates.value[data.key]) return
+  loadingStates.value[data.key] = true
 }
+
+window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
+  if(data.done){
+    loadingStates.value[data.key] = false
+  }
+})
 </script>
 
 <template>
@@ -43,7 +37,6 @@ async function onLineSendButton(data, index){
     :value="store.listdata"
     @rowSelect="onRowSelect"
     @rowUnselect="onRowUnselect"
-    dataKey="key"
     v-model:selection="selectedProduct"
     selectionMode="single"
     size="small"
@@ -57,7 +50,7 @@ async function onLineSendButton(data, index){
     <Column class="!text-end">
       <template #body="{ data , index}">
         <!-- :icon 可以支持表达式 -->
-        <Button :icon="!loadingStates[index]?'pi pi-angle-right':'pi pi-spinner pi-spin'" size="small" @click="onLineSendButton(data, index)" severity="secondary" rounded></Button>
+        <Button :icon="!loadingStates[data.key]?'pi pi-angle-right':'pi pi-spinner pi-spin'" size="small" @click="onLineSendButton(data, index)" severity="secondary" rounded></Button>
       </template>
     </Column>
   </DataTable>
