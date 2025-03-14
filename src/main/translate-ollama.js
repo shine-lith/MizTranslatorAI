@@ -84,6 +84,24 @@ class TranslateOllama {
     }
   }
 
+  async *translateStreamFake(text, option={}){
+    try{
+      const k = 'Dictxxxx'
+      const chunks = [
+        { key:k, partial: '一', done:false},
+        { key:k, partial: '二', done:false},
+        { key:k, partial: '三', done:false},
+        { key:k, partial: '四', done:true}
+      ];
+      for (const chunk of chunks) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+        yield chunk;
+      }
+    } catch (error){
+
+    }
+  }
+
   // 解析结果
   #parseResult(text, response) {
     const resultText = response.message.content.replace(/<think\b[^>]*>[\s\S]*?<\/think>/g, '')
