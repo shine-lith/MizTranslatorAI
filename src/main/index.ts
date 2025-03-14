@@ -153,10 +153,8 @@ ipcMain.on('translate:chunk', async (e, data) => {
     maxRetries: 3
   })
 
-  const stream = translator.translateStreamFake(data.originText)
+  const stream = translator.translateStream(data.originText)
   for await (const chunk of stream) {
-    console.log('Partial:', chunk.partial)
-
     var result = { ...data, ...{
       done: chunk.done,
       chunk: chunk.partial
@@ -291,78 +289,118 @@ async function openFile() {
 
 // 读取miz文件
 function loadMizFile(file) {
-  debugInfo('MainloadMizFile:' + file)
-  fs.readFile(file, 'utf8', (err, data) => {
-    yauzl.open(file, { lazyEntries: true }, function (err, zipfile) {
-      if (err) {
-        win.webContents.send('onMizOpen', 400)
-        clearProjectWorkPath()
-        notification('无法打开此文件', '因为文件格式存在问题', null)
-        debugInfo('Cant read miz like zip')
-        throw err
+  yauzl.open(file, { lazyEntries: true }, (err, zipfile) => {
+    if (err) {
+      handleError('无法打开此文件', '因为文件格式存在问题', 'Cant read miz like zip');
+      return;
+    }
+    // 关闭文件的逻辑
+    let foundTarget = false;
+    const cleanup = () => {
+      if (zipfile) {
+        zipfile.close();
       }
-      zipfile.readEntry()
-      zipfile.on('entry', (entry) => {
-        if (entry.fileName === 'l10n/DEFAULT/dictionary') {
-          zipfile.openReadStream(entry, function (err, readStream) {
-            if (err) {
-              win.webContents.send('onMizOpen', 400)
-              clearProjectWorkPath()
-              notification('无法打开此文件', '文件可能已损坏', null)
-              debugInfo('Cant read l10n/DEFAULT/dictionary')
-              throw err
-            }
-            setProjectWorkPath(file)
-            readStream.on('data', function (data) {
-              var listData = loadLua(data.toString('utf8'))
-              // 过滤掉无需处理的行，加载类型的翻译，如果TYPE_MAPSETTING里没有，则不过滤
-              listData = listData.filter((line) => {
-                var r = line.key.match(/DictKey_(.*)_\d+/)
-                var type = r ? r[1] : 'Text'
-                line.type = TYPE_MAPSETTING[type]['text'] ? TYPE_MAPSETTING[type]['text'] : type
-                if (TYPE_MAPSETTING[type]) {
-                  return TYPE_MAPSETTING[type]['keep'] == true
-                } else {
-                  return true
-                }
-              })
-              // 添加stamp
-              //var stampStart = new Date().getTime(); // 使用时间戳作为标识
-              var i = 0
-              listData.forEach((line) => {
-                //line.translateStamp = stampStart + i++;  // 标识按顺序排
-                line.translateStamp = md5(line.originText) // 标识改为原文的md5，相同的内容从cache中获取
-              })
-              // 尝试加载与工程目录内的翻译工程文件(*.tran)
-              var tranData = loadTranFile()
-              // 从翻译工程文件中读入到listData
-              if (tranData) {
-                listData.forEach((line) => {
-                  var tranLine = tranData.find((item) => {
-                    return item.key == line.key
-                  })
-                  // 从tran文件中载入译文和翻译戳
-                  line.translateText = tranLine.translateText
-                  line.translateStamp = tranLine.translateStamp
-                })
-              }
+    };
 
-              // 通知UI 数据已加载
-              win.webContents.send('onMizOpen', 200, {
-                mizFile: file,
-                projectPath: projectPath,
-                data: listData
-              })
-              mizFile = file
-            })
-          })
-        } else {
-          zipfile.readEntry()
-        }
-      })
-    })
-  })
+    // 打开dictionary文件
+    zipfile.on('entry', (entry) => {
+      if (entry.fileName === 'l10n/DEFAULT/dictionary') {
+        foundTarget = true;
+        processDictionary(zipfile, entry, file, cleanup);
+      } else {
+        zipfile.readEntry();
+      }
+    });
+
+    // 
+    zipfile.on('end', () => {
+      if (!foundTarget) {
+        handleError('无效的任务文件', '缺少必要的字典文件', 'Missing l10n/DEFAULT/dictionary');
+        cleanup();
+      }
+    });
+
+    zipfile.readEntry();
+  });
 }
+
+// 专用错误处理函数
+function handleError(title, message, debugMsg) {
+  win.webContents.send('onMizOpen', 400);
+  clearProjectWorkPath();
+  notification(title, message, null);
+  debugInfo(debugMsg);
+}
+
+// 处理字典文件的核心逻辑
+function processDictionary(zipfile, entry, file, cleanup) {
+  zipfile.openReadStream(entry, (err, readStream) => {
+    if (err) {
+      handleError('无法打开此文件', '文件可能已损坏', 'Cant read l10n/DEFAULT/dictionary');
+      cleanup();
+      return;
+    }
+    // 分块载入内容
+    const chunks = [];
+    readStream.on('data', (chunk) => chunks.push(chunk));
+    readStream.on('end', () => {
+      try {
+        const fullContent = Buffer.concat(chunks).toString('utf8');
+        const listData = processContent(fullContent);
+        sendSuccess(file, listData);
+      } catch (e) {
+        handleError('文件解析失败', '内容格式不符合要求', `Parse error: ${e.message}`);
+      } finally {
+        cleanup();
+      }
+    });
+
+    readStream.on('error', (err) => {
+      handleError('读取文件失败', '数据流异常中断', `Stream error: ${err.message}`);
+      cleanup();
+    });
+  });
+}
+
+// 处理内容解析
+function processContent(content) {
+  const listData = loadLua(content).filter(line => {
+    const r = line.key.match(/DictKey_(.*)_\d+/);
+    const type = r ? r[1] : 'Text';
+    line.type = TYPE_MAPSETTING[type]?.text || type;
+    return TYPE_MAPSETTING[type] ? TYPE_MAPSETTING[type].keep : true;
+  });
+
+  // 添加翻译标识
+  listData.forEach(line => {
+    line.translateStamp = md5(line.originText);
+  });
+
+  // 合并翻译数据
+  const tranData = loadTranFile();
+  if (tranData) {
+    listData.forEach(line => {
+      const tranLine = tranData.find(item => item.key === line.key);
+      if (tranLine) {
+        line.translateText = tranLine.translateText;
+        line.translateStamp = tranLine.translateStamp;
+      }
+    });
+  }
+
+  return listData;
+}
+
+// 成功处理
+function sendSuccess(file, listData) {
+  setProjectWorkPath(file);
+  win.webContents.send('onMizOpen', 200, {
+    mizFile: file,
+    projectPath: projectPath,
+    data: listData
+  });
+}
+
 
 // 清空工作区路径
 function clearProjectWorkPath() {
@@ -381,6 +419,7 @@ function setProjectWorkPath(mizFile) {
 // 读取lua文件
 // fileContent lua 代码
 function loadLua(fileContent) {
+  console.log(fileContent)
   var events = new (require('events').EventEmitter)()
 
   Object.keys(luaparse.ast).forEach(function (type) {
