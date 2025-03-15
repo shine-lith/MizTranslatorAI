@@ -79,6 +79,7 @@ function onLineSend(data) {
     <div class="flex-1 flex overflow-hidden">
       <Splitter
         class="flex-1 flex overflow-hidden"
+        gutterSize=1
         stateKey="main_side_splitter"
         stateStorage="local"
         layout="vertical"
