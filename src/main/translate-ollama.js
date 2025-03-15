@@ -75,10 +75,7 @@ class TranslateOllama {
       const response = await this.#executeRequest(text, { ...options, stream: true })
       
       for await (const chunk of response) {
-        console.log(chunk)
-        // if (chunk.message?.content) {
           yield this.#parseChunk(chunk)
-        // }
       }
     } catch (error) {
       throw new Error(`Stream translation failed: ${error.message}`)

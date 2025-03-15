@@ -11,24 +11,41 @@ const selectedProduct = ref()
 const loadingStates = ref({})
 
 function onRowSelect(event) {
-  console.log('onRowSelect')
+
 }
 
 function onRowUnselect(event) {
-  console.log('onRowUnselect')
+
 }
 
 async function onLineSendButton(data, index){
+  var line = store.listdata.find((d)=>d.key == data.key)
+  line.translateText = '';
+
   emit('onLineSend', data)
+  // 启动loading动画
   if (loadingStates.value[data.key]) return
   loadingStates.value[data.key] = true
 }
 
+// 监听翻译的流
 window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
-  if(data.done){
+  var line = store.listdata.find((d)=>d.key == data.key)
+  line.translateText += data.chunk
+
+  if(data.done){ //消除loading动画
+    line.translateText = removeThinkTags(line.translateText)
+    line.translateText = line.translateText.trim
     loadingStates.value[data.key] = false
   }
 })
+
+function removeThinkTags(str) {
+  // 匹配 <think> 标签及其内容（包括多行情况）
+  const regex = /<think\b[^>]*>[\s\S]*?<\/think>/g;
+  return str.replace(regex, '');
+}
+
 </script>
 
 <template>
