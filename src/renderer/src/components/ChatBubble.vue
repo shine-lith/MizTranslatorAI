@@ -17,6 +17,9 @@ const props = defineProps({
   question_id: {
     type: String,
     required: true
+  },
+  loading: {
+    type: Boolean,
   }
 })
 
@@ -40,22 +43,25 @@ const handleResend = () => {
         @mouseleave="isHovering = false"
       >
         <!-- 气泡 -->
-        <div class="max-w-[90%]">
-          <div class="">
-            <p>> {{ message }}</p>
+        <div class="max-w-[100%] flex">
+          <i class="pi pi-chevron-right text-xs m-1" ></i>
+          <div class="text-justify">
+            <span>{{ message }}</span>
           </div>
         </div>
         <!-- 重发按钮 -->
-        <button v-show="isHovering" @click="handleResend" class="my-auto">↻</button>
+        <!-- <button v-show="isHovering" @click="handleResend" class="my-auto">↻</button> -->
       </div>
     </div>
 
     <!-- 返回的消息 -->
     <div v-else-if="type === 'assistant'">
       <div class="flex items-start text-sm">
-        <div class="max-w-[100%]">
+        <div class="max-w-[100%] flex items-start">
+          <i v-if="loading === true" class="pi pi-spin pi-spinner text-xs m-1" ></i>
+          <i v-else class="pi pi-circle text-xs m-1" ></i>
           <div class="">
-            <p v-if="message ===''">正在等待LLM回复</p>
+            <p v-if="message ===''">等待回复</p>
             <p v-else>{{ message }}</p>
           </div>
         </div>

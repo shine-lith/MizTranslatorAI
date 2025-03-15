@@ -35,7 +35,7 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
 
   if(data.done){ //消除loading动画
     line.translateText = removeThinkTags(line.translateText)
-    line.translateText = line.translateText.trim
+    line.translateText = line.translateText.trim()
     loadingStates.value[data.key] = false
   }
 })

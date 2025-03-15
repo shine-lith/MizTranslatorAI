@@ -36,7 +36,8 @@ function addAssistantLine(question_id, dictkey) {
       dictkey: dictkey,
       type: 'assistant',
       message: '',
-      question_id: question_id
+      question_id: question_id,
+      loading: true,
     }
   })
 }
@@ -48,8 +49,12 @@ function removeComponent(id) {
 // 监听翻译的流
 window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
   var com = componentList.value.find((comp)=> comp.props.type == 'assistant' && comp.props.question_id == data.question_id)
-  if (com) 
+  if (com) {
     com.props.message += data.chunk
+    if(data.done){
+      com.props.loading = false
+    }
+  }
 })
 
 </script>
@@ -59,7 +64,7 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
   <div class="p-2 top-0 w-full backdrop-blur-sm border-b border-gray-700">
     <div class="flex items-center">
       <div class="flex-1 flex gap-2">
-        <h1 class="font-semibold text-sm">LLM交互</h1>
+        <h1 class="font-semibold text-sm">与LLM交互</h1>
         <p class="text-sm">Ollama - DeepSeek-r1:32b</p>
       </div>
       <div class="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white">
@@ -75,7 +80,7 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     </div>
   </div>
 
-  <div class="h-full overflow-y-auto pl-0 pr-0 gap-2">
+  <div class="h-full overflow-y-auto pl-0 pr-3 gap-2">
     <component
       v-for="comp in componentList"
       :is="comp.name"
