@@ -149,7 +149,7 @@ ipcMain.handle('translate:single', async (e, data)=> {
 ipcMain.on('translate:chunk', async (e, data) => {
   const translator = new TranslateOllama({
     host: 'http://192.168.1.12:11434',
-    model: 'deepseek-r1:32b',
+    model: 'huihui_ai/qwq-abliterated:latest',
     maxRetries: 3
   })
 
@@ -371,9 +371,9 @@ function processContent(content) {
     return TYPE_MAPSETTING[type] ? TYPE_MAPSETTING[type].keep : true;
   });
 
-  // 添加翻译标识
   listData.forEach(line => {
-    line.translateStamp = md5(line.originText);
+    line.translateText = ''
+    line.translateStamp = md5(line.originText);   // 添加翻译标识
   });
 
   // 合并翻译数据
