@@ -85,14 +85,35 @@ class TranslateOllama {
   async *translateStreamFake(text, option={}){
     try{
       const k = 'Dictxxxx'
-      const chunks = [
-        { key:k, partial: '一', done:false},
-        { key:k, partial: '二', done:false},
-        { key:k, partial: '三', done:false},
-        { key:k, partial: '四', done:true}
+      var chunks = [
+        { key:k, partial: 'RAV', done:false},
+        { key:k, partial: 'EN ', done:false},
+        { key:k, partial: '1-1', done:false},
+        { key:k, partial: '（刀', done:false},
+        { key:k, partial: '锋）', done:false},
+        { key:k, partial: '：确', done:false},
+        { key:k, partial: '认，', done:false},
+        { key:k, partial: '南方', done:false},
+        { key:k, partial: '5英', done:false},
+        { key:k, partial: '里处', done:false},
+        { key:k, partial: '有一', done:false},
+        { key:k, partial: '架加', done:false},
+        { key:k, partial: '油机', done:false},
+        { key:k, partial: '，另', done:false},
+        { key:k, partial: '一架', done:false},
+        { key:k, partial: '……', done:false},
+        { key:k, partial: '在东', done:false},
+        { key:k, partial: '方7', done:false},
+        { key:k, partial: '英里', done:false},
+        { key:k, partial: '处。', done:false},
       ];
+      for (let i = 0; i < 5; i++) {
+        chunks = chunks.concat(chunks);
+      }
+      chunks.push({key:k, partial: '', done:true})
+      
       for (const chunk of chunks) {
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 50));
         yield chunk;
       }
     } catch (error){
