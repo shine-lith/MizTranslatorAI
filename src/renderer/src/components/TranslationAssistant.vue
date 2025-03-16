@@ -1,20 +1,33 @@
 <script setup>
-import { ref } from 'vue'
+import { ref,nextTick } from 'vue'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import ChatBubble from './ChatBubble.vue'
 
 defineExpose({
   addUserLine,
-  addAssistantLine
+  addAssistantLine,
+  scrollToBottom,
 })
 
-const value = ref(null)
+const emit = defineEmits(['onLineSend'])
+
+const chatInput = ref(null)
 const componentList = ref([])
 const counter = ref(0)
+const componentContainer = ref(null)
+
+function onChatSend(){
+  const data = {
+    key: '',
+    originText: chatInput.value
+  }
+  emit('onLineSend', data)
+  chatInput.value = ''
+}
 
 // 添加用户输入行
-function addUserLine(question_id, dictkey, text){
+async function addUserLine(question_id, dictkey, text){
   componentList.value.push({
     id: ++counter.value,
     name: 'ChatBubble', // 必须已注册
@@ -25,10 +38,12 @@ function addUserLine(question_id, dictkey, text){
       question_id: question_id 
     }
   })
+  await nextTick() // 确保DOM先执行更新，然后设置滚动条
+  scrollToBottom(true)
 }
 
 // 添加LLM的反馈行
-function addAssistantLine(question_id, dictkey) {
+async function addAssistantLine(question_id, dictkey) {
   componentList.value.push({
     id: ++counter.value,
     name: 'ChatBubble', // 必须已注册
@@ -40,11 +55,28 @@ function addAssistantLine(question_id, dictkey) {
       loading: true,
     }
   })
+  await nextTick() // 确保DOM先执行更新，然后设置滚动条
+  scrollToBottom(true)
 }
 
 function removeComponent(id) {
   componentList.value = componentList.value.filter((comp) => comp.id !== id)
 }
+
+// 滚动到最底部
+function scrollToBottom(force = false) {
+  const el = componentContainer.value;
+  if (force) {
+    el.scrollTop = el.scrollHeight;
+    return
+  }
+  const threshold = 20 // 允许的误差范围
+  // 判断是否接近底部
+  const isNearBottom = el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+  if (isNearBottom) {
+    el.scrollTop = el.scrollHeight;
+  }
+};
 
 // 监听翻译的流
 window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
@@ -54,6 +86,7 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     if(data.done){
       com.props.loading = false
     }
+    scrollToBottom()
   }
 })
 
@@ -79,8 +112,7 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
       </div>
     </div>
   </div>
-
-  <div class="h-full overflow-y-auto pl-0 pr-3 gap-2">
+  <div ref="componentContainer" class="h-full overflow-y-auto pl-0 pr-3 gap-2">
     <component
       v-for="comp in componentList"
       :is="comp.name"
@@ -90,9 +122,9 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     />
   </div>
   <div class="p-1 w-full backdrop-blur-sm border-t border-gray-700 flex gap-2">
-    <InputText class="border-none flex-1" placeholder="给LLM发送消息" aria-multiline />
+    <InputText v-model="chatInput" class="border-none flex-1" placeholder="给LLM发送消息" aria-multiline />
     <Button
-      @click=""
+      @click="onChatSend"
       class="ml-4"
       aria-multiline
       rounded

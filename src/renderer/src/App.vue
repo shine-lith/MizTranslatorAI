@@ -88,7 +88,7 @@ function onLineSend(data) {
           <TextList ref="textlistRef" @onLineSend="onLineSend"/>
         </SplitterPanel>
         <SplitterPanel class="flex-1 flex flex-col">
-          <TranslationAssistant ref="chatRef" />
+          <TranslationAssistant ref="chatRef" @onLineSend="onLineSend"/>
         </SplitterPanel>
       </Splitter>
     </div>

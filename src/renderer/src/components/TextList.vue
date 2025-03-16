@@ -31,13 +31,15 @@ async function onLineSendButton(data, index){
 // 监听翻译的流
 window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
   var line = store.listdata.find((d)=>d.key == data.key)
-  line.translateText += data.chunk
-
-  if(data.done){ //消除loading动画
-    line.translateText = removeThinkTags(line.translateText)
-    line.translateText = line.translateText.trim()
-    loadingStates.value[data.key] = false
+  if (line){
+    line.translateText += data.chunk
+    if(data.done){ //消除loading动画
+      line.translateText = removeThinkTags(line.translateText)
+      line.translateText = line.translateText.trim()
+      loadingStates.value[data.key] = false
+    }
   }
+
 })
 
 function removeThinkTags(str) {
