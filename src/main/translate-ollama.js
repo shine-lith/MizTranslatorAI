@@ -18,6 +18,42 @@ class TranslateOllama {
     this.ollama = new Ollama({
       host: this.config.host
     })
+
+    this.tasks = []
+    this.isRunning = false
+  }
+
+  addTask(text, callback){
+    var task = {
+      text: text,
+      callback: callback
+    }
+
+    this.tasks.push(task)
+    console.log('PUSH TASK: ' + text)
+    if(!this.isRunning){
+      this.run()
+    }
+  }
+
+  async run(){
+    this.isRunning = true
+    const task = this.tasks[0]
+
+    console.log('RUN TASK: ' + task.text)
+    const stream = await this.translateStreamFake(task.text)
+    task.callback(stream)
+  }
+
+  loop(){
+    this.tasks.shift()
+    // if need stoped
+
+    if(this.tasks.length > 0 ){
+      this.run()
+    }else{
+      this.isRunning = false
+    }
   }
 
   // 带重试和超时的请求核心方法
@@ -73,7 +109,6 @@ class TranslateOllama {
   async *translateStream(text, options = {}) {
     try {
       const response = await this.#executeRequest(text, { ...options, stream: true })
-      
       for await (const chunk of response) {
           yield this.#parseChunk(chunk)
       }
@@ -82,6 +117,7 @@ class TranslateOllama {
     }
   }
 
+  // 模拟的流式翻译方法
   async *translateStreamFake(text, option={}){
     try{
       const k = 'Dictxxxx'
@@ -113,7 +149,7 @@ class TranslateOllama {
       chunks.push({key:k, partial: '', done:true})
       
       for (const chunk of chunks) {
-        await new Promise(resolve => setTimeout(resolve, 50));
+        await new Promise(resolve => setTimeout(resolve, 10));
         yield chunk;
       }
     } catch (error){

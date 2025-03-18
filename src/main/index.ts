@@ -48,6 +48,13 @@ var dbAdapter = new FileSync(FILE_DB, {
 })
 var db = low(dbAdapter)
 
+
+const translator = new TranslateOllama({
+  host: 'http://192.168.1.12:11434',
+  model: 'huihui_ai/qwq-abliterated:latest',
+  maxRetries: 3
+})
+
 function createWindow(): void {
   // 设置Menu
   initDb()
@@ -147,21 +154,26 @@ ipcMain.handle('translate:single', async (e, data)=> {
 })
 
 ipcMain.on('translate:chunk', async (e, data) => {
-  const translator = new TranslateOllama({
-    host: 'http://192.168.1.12:11434',
-    model: 'huihui_ai/qwq-abliterated:latest',
-    maxRetries: 3
-  })
-
-  const stream = translator.translateStream(data.originText)
+  const stream = translator.translateStreamFake(data.originText)
   for await (const chunk of stream) {
     var result = { ...data, ...{
       done: chunk.done,
       chunk: chunk.partial
     } }
-
     win.webContents.send('onTranslateChunk', result)
   }
+
+//   translator.addTask(data.originText, async (stream)=>{
+//     for await (const chunk of stream) {
+//       var result = { ...data, ...{
+//         done: chunk.done,
+//         chunk: chunk.partial
+//       } }
+//       win.webContents.send('onTranslateChunk', result)
+//     }
+//     console.log('LOOP');
+//     translator.loop()
+//   })
 })
 
 ipcMain.on('dev:devFunction', () => {
