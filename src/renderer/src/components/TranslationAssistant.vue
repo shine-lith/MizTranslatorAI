@@ -10,7 +10,7 @@ defineExpose({
   scrollToBottom,
 })
 
-const emit = defineEmits(['onLineSend'])
+const emit = defineEmits(['onLineSend','onTranslateAll'])
 
 const chatInput = ref(null)
 const componentList = ref([])
@@ -24,6 +24,10 @@ function onChatSend(){
   }
   emit('onLineSend', data)
   chatInput.value = ''
+}
+
+function onTranslateAll(){
+  emit('onTranslateAll')
 }
 
 // 添加用户输入行
@@ -97,19 +101,11 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
   <div class="p-2 top-0 w-full backdrop-blur-sm border-b border-gray-700">
     <div class="flex items-center">
       <div class="flex-1 flex gap-2">
-        <h1 class="font-semibold text-sm">与LLM交互</h1>
+        <h1 class="font-semibold text-sm">LLM</h1>
         <p class="text-sm">Ollama - DeepSeek-r1:32b</p>
       </div>
-      <div class="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-          />
-        </svg>
-      </div>
+      <Button class="h-4" @click="onTranslateAll" label="翻译所有" icon="pi pi-play-circle" variant="text" />
+      <Button class="h-4" @click="showPreference" icon="pi pi-stop-circle" variant="text" />
     </div>
   </div>
   <div ref="componentContainer" class="h-full overflow-y-auto pl-0 pr-3 gap-2">
