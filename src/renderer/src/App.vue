@@ -18,6 +18,8 @@ const titleBarRef = ref()
 const textlistRef = ref()
 const chatRef = ref()
 const projectPath = ref() // 项目路径
+const llmTasks = []
+var isRunning = false
 
 window.electron.ipcRenderer.on('onNotification', (e, message, data) => {
   toast.add({ severity: 'secondary', summary: message.msg, detail: message.desc, life: 3000 })
@@ -48,28 +50,53 @@ function onSaveFile() {
   }
 }
 
+// 向LLM询问
 function onLineSend(data) {
-  var question_id = Date.now() + Math.random().toString(36).substring(2);
-  chatRef.value.addUserLine(question_id, data.key, data.originText)
-  chatRef.value.addAssistantLine(question_id, data.key)
-  
-  window.api.translateChunk({
-    question_id: question_id,
-    key: data.key,
-    originText: data.originText
-  })
-
-
-  // window.api.translateSingle({
-  //   key: data.key,
-  //   originText: data.originText,
-  // }).then((result)=>{
-  //   loadingStates.value[index] = false;
-  //   data.translateText = result
-  // }).catch((err)=>{
-  //   loadingStates.value[index] = false;
-  // });
+  addQueue(data)
 }
+// 自动翻译所有
+function onTranslateAll() {
+  //todo add all store.data to list
+}
+
+// 向LLM交互队列里添加任务
+function addQueue(data){
+  llmTasks.push(data)
+  if(!isRunning){
+    run()
+  }
+}
+
+// 执行队列
+function run(){
+  isRunning = true
+  const data = llmTasks[0]
+  const send = async ()=> {
+    // 向底层发送流式翻译请求
+    var question_id = Date.now() + Math.random().toString(36).substring(2);
+    chatRef.value.addUserLine(question_id, data.key, data.originText)
+    chatRef.value.addAssistantLine(question_id, data.key)
+    window.api.translateChunk({
+      question_id: question_id,
+      key: data.key,
+      originText: data.originText
+    })
+  }
+  send()
+}
+
+// 监听翻译的流
+window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
+  // 如果是流传输完毕则启动下一个任务
+  if(data.done){
+    llmTasks.shift()
+    if(llmTasks.length > 0 ){
+      run()
+    }else{
+      isRunning = false
+    }
+  }
+})
 </script>
 
 <template>
@@ -88,7 +115,7 @@ function onLineSend(data) {
           <TextList ref="textlistRef" @onLineSend="onLineSend"/>
         </SplitterPanel>
         <SplitterPanel class="flex-1 flex flex-col">
-          <TranslationAssistant ref="chatRef" @onLineSend="onLineSend"/>
+          <TranslationAssistant ref="chatRef" @onLineSend="onLineSend" onTranslateAll="onTranslateAll"/>
         </SplitterPanel>
       </Splitter>
     </div>
