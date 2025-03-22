@@ -26,7 +26,6 @@ const props = defineProps({
 const emit = defineEmits(['resend'])
 
 const isHovering = ref(false)
-
 const handleResend = () => {
   emit('resend', props.message)
 }

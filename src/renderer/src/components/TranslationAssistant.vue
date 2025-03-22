@@ -22,6 +22,7 @@ const componentList = ref([])
 const counter = ref(0)
 const componentContainer = ref(null)
 
+// 发送用户输入的问题到LLM询问队列
 function onChatSend(){
   if(chatLoading.value){
     return
