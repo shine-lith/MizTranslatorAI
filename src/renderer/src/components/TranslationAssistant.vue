@@ -10,7 +10,11 @@ defineExpose({
   scrollToBottom,
 })
 
-const emit = defineEmits(['onLineSend','onTranslateAll'])
+defineProps({
+  isQueueRunning: Boolean
+})
+
+const emit = defineEmits(['onLineSend','onTranslateAll','onTranslateStop'])
 
 const chatInput = ref(null)
 const chatLoading = ref(false)
@@ -20,6 +24,9 @@ const componentContainer = ref(null)
 
 function onChatSend(){
   if(chatLoading.value){
+    return
+  }
+  if(!chatInput.value){
     return
   }
   const data = {
@@ -33,6 +40,10 @@ function onChatSend(){
 
 function onTranslateAll(){
   emit('onTranslateAll')
+}
+
+function onTranslateStop(){
+  emit('onTranslateStop')
 }
 
 // 添加用户输入行
@@ -112,8 +123,8 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
         <h1 class="font-semibold text-sm">LLM</h1>
         <p class="text-sm">Ollama - DeepSeek-r1:32b</p>
       </div>
-      <Button class="h-4" @click="onTranslateAll" label="翻译所有" icon="pi pi-play-circle" variant="text" />
-      <Button class="h-4" @click="showPreference" icon="pi pi-stop-circle" variant="text" />
+      <Button v-show="!isQueueRunning" class="h-4" @click="onTranslateAll" label="翻译所有" icon="pi pi-bolt" variant="text" />
+      <Button v-show="isQueueRunning" class="h-4" @click="onTranslateStop" label="停止" icon="pi pi-stop-circle" variant="text" />
     </div>
   </div>
   <div ref="componentContainer" class="h-full overflow-y-auto pl-0 pr-3 gap-2">
@@ -132,8 +143,9 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
       class="ml-4"
       aria-multiline
       rounded
-      :icon="chatLoading?'pi pi-stop':'pi pi-arrow-up'"
+      :icon="chatLoading?'pi pi-spin pi-spinner':'pi pi-arrow-up'"
       size="small"
+      :disabled="chatLoading"
     />
   </div>
 </template>
