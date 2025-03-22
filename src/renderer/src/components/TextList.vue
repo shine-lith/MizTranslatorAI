@@ -5,10 +5,13 @@ import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Button from 'primevue/button'
 
+defineExpose({
+  setLineLoading
+})
 const emit = defineEmits(['onLineSend'])
 
 const selectedProduct = ref()
-const loadingStates = ref({})
+const loadingStates = ref([])
 
 function onRowSelect(event) {
 
@@ -25,7 +28,7 @@ async function onLineSendButton(data, index){
   emit('onLineSend', data)
   // 启动loading动画
   if (loadingStates.value[data.key]) return
-  loadingStates.value[data.key] = true
+  setLineLoading(data, true)
 }
 
 // 监听翻译的流
@@ -36,11 +39,16 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     if(data.done){ //消除loading动画
       line.translateText = removeThinkTags(line.translateText)
       line.translateText = line.translateText.trim()
-      loadingStates.value[data.key] = false
+      setLineLoading(data, false)
     }
   }
 
 })
+
+// 设置这一行的loading 状态
+function setLineLoading(data, state){
+  loadingStates.value[data.key] = state
+}
 
 function removeThinkTags(str) {
   // 匹配 <think> 标签及其内容（包括多行情况）
@@ -69,7 +77,7 @@ function removeThinkTags(str) {
     <Column class="!text-end">
       <template #body="{ data , index}">
         <!-- :icon 可以支持表达式 -->
-        <Button :icon="!loadingStates[data.key]?'pi pi-angle-right':'pi pi-spinner pi-spin'" size="small" @click="onLineSendButton(data, index)" severity="secondary" rounded></Button>
+        <Button :icon="!loadingStates[data.key]?'pi pi-angle-right':'pi pi-spinner pi-spin'" :disabled="loadingStates[data.key]" size="small" @click="onLineSendButton(data, index)" severity="secondary" rounded></Button>
       </template>
     </Column>
   </DataTable>
