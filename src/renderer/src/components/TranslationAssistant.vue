@@ -13,17 +13,22 @@ defineExpose({
 const emit = defineEmits(['onLineSend','onTranslateAll'])
 
 const chatInput = ref(null)
+const chatLoading = ref(false)
 const componentList = ref([])
 const counter = ref(0)
 const componentContainer = ref(null)
 
 function onChatSend(){
+  if(chatLoading.value){
+    return
+  }
   const data = {
     key: '',
     originText: chatInput.value
   }
-  emit('onLineSend', data)
   chatInput.value = ''
+  chatLoading.value = true
+  emit('onLineSend', data)
 }
 
 function onTranslateAll(){
@@ -92,6 +97,9 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     }
     scrollToBottom()
   }
+  if(data.done){
+    chatLoading.value = false
+  }
 })
 
 </script>
@@ -124,7 +132,7 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
       class="ml-4"
       aria-multiline
       rounded
-      icon="pi pi-arrow-up"
+      :icon="chatLoading?'pi pi-stop':'pi pi-arrow-up'"
       size="small"
     />
   </div>
