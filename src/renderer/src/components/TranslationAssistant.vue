@@ -118,14 +118,22 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
 
 <template>
   <!-- 顶部导航 -->
-  <div class="p-2 top-0 w-full backdrop-blur-sm border-b border-gray-700">
-    <div class="flex items-center">
-      <div class="flex-1 flex gap-2">
+  <div class="top-0 w-full backdrop-blur-sm border-b border-gray-700">
+    <div class="h-8 flex items-center">
+      <div class="p-2 flex-1 flex gap-2">
         <h1 class="font-semibold text-sm">LLM</h1>
         <p class="text-sm">Ollama - DeepSeek-r1:32b</p>
       </div>
-      <Button v-show="!isQueueRunning" class="h-4" @click="onTranslateAll" label="翻译所有" icon="pi pi-bolt" variant="text" />
-      <Button v-show="isQueueRunning" class="h-4" @click="onTranslateStop" label="停止" icon="pi pi-stop-circle" variant="text" />
+      <Button v-show="!isQueueRunning" class="p-1" @click="onTranslateAll" label="翻译所有" icon="pi pi-bolt" variant="text" >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+          <path d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z" />
+        </svg>
+      </Button>
+      <Button v-show="isQueueRunning" class="p-1" @click="onTranslateStop" label="停止"  variant="text" >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+          <path d="M5.25 3A2.25 2.25 0 0 0 3 5.25v9.5A2.25 2.25 0 0 0 5.25 17h9.5A2.25 2.25 0 0 0 17 14.75v-9.5A2.25 2.25 0 0 0 14.75 3h-9.5Z" />
+        </svg>
+      </Button>
     </div>
   </div>
   <div ref="componentContainer" class="h-full overflow-y-auto pl-0 pr-3 gap-2">
@@ -138,10 +146,10 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     />
   </div>
   <div class="p-1 w-full backdrop-blur-sm border-t border-gray-700 flex gap-2">
-    <InputText v-model="chatInput" class="border-none flex-1" placeholder="给LLM发送消息" aria-multiline />
+    <InputText v-model="chatInput" class="border-none flex-1" placeholder="向LLM发送消息" aria-multiline />
     <Button
       @click="onChatSend"
-      class="ml-4"
+      class="m-1"
       aria-multiline
       rounded
       :icon="chatLoading?'pi pi-spin pi-spinner':'pi pi-arrow-up'"
