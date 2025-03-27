@@ -19,7 +19,7 @@ async function onOllamaList() {
 }
 
 onMounted(() => {
-    if(settings.value.ollama_model_list)
+    if(settings.value.ollama_model_list )
         ollamaModels.value = JSON.parse(settings.value.ollama_model_list)
 })
 
@@ -44,14 +44,14 @@ onMounted(() => {
                 <Textarea id="system_prompt" v-model="settings.system_prompt" autoResize variant="filled" />
 
                 <h2>Ollama</h2>
-                <label for="ollama_url">API地址</label>
-                <InputText id="ollama_url" class="flex-1" v-model="settings.ollama_url" variant="filled" placeholder="http://127.0.0.1:11434" />
+                <label for="ollama_host">API地址</label>
+                <InputText id="ollama_host" class="flex-1" v-model="settings.ollama_host" variant="filled" placeholder="http://127.0.0.1:11434" />
                 
                 
                 <label for="ollama_model">模型</label>
                 <div class="flex gap-5">
                     <Select id="ollama_model" v-model="settings.ollama_model" :options="ollamaModels" placeholder="选择一个模型" checkmark :highlightOnSelect="false" class="w-full md:w-56" />
-                    <Button :disabled="settings.ollama_url == ''" @click="onOllamaList" label="刷新模型列表" severity="secondary" />
+                    <Button :disabled="settings.ollama_host == ''" @click="onOllamaList" label="刷新模型列表" severity="secondary" />
                 </div>
 
                 <label for="ollama_context_limit">最大上下文长度</label>

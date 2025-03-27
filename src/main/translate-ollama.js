@@ -176,6 +176,10 @@ class TranslateOllama {
       done: chunk.done || false
     }
   }
+
+  getModelList() {
+    return this.ollama.list()
+  }
 }
 
 export { TranslateOllama }
