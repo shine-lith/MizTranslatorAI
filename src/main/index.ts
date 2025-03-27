@@ -153,8 +153,13 @@ ipcMain.handle('translate:single', async (e, data)=> {
   return result.result
 })
 
+ipcMain.handle('ollama:list', async (e)=>{
+  const result = await translator.getModelList()
+  return result
+})
+
 ipcMain.on('translate:chunk', async (e, data) => {
-  const stream = translator.translateStreamFake(data.originText)
+  const stream = translator.translateStream(data.originText)
   for await (const chunk of stream) {
     var result = { ...data, ...{
       done: chunk.done,
