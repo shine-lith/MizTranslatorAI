@@ -57,27 +57,24 @@ class TranslateOllama {
   }
 
   // 带重试和超时的请求核心方法
-  async #executeRequest(text, options) {
+  async #executeRequest(text, history, options) {
     try {
       return await retry(
         async (bail) => {
           try {
-            const response = await this.ollama.chat({
+            history.push({
+              role: 'user', content: text
+            })
+            const args = {
               model: this.config.model,
-              messages: [
-                {
-                  role: 'system',
-                  content:
-                    '你是一名专业翻译，具有军事专业知识，严格遵守要求。将用户的文本翻译成中文，保持原意，无需解释。'
-                },
-                { role: 'user', content: text }
-              ],
               keep_alive: this.config.keepAlive,
+              messages: history,
               options: {
                 temperature: this.config.temperature
               },
               stream: options.stream
-            })
+            }
+            const response = await this.ollama.chat(args)
             return response
           } catch (error) {
             //bail(error) 不重试直接退出
@@ -98,7 +95,7 @@ class TranslateOllama {
   // 标准翻译方法
   async translate(text, options = {}) {
     try {
-      const response = await this.#executeRequest(text, options)
+      const response = await this.#executeRequest(text, history, options)
       return this.#parseResult(text, response)
     } catch (error) {
       throw new Error(`Translation failed: ${error.message}`)
@@ -106,9 +103,9 @@ class TranslateOllama {
   }
 
   // 流式翻译方法
-  async *translateStream(text, options = {}) {
+  async *translateStream(text, history, options = {}) {
     try {
-      const response = await this.#executeRequest(text, { ...options, stream: true })
+      const response = await this.#executeRequest(text, history, { ...options, stream: true })
       for await (const chunk of response) {
           yield this.#parseChunk(chunk)
       }

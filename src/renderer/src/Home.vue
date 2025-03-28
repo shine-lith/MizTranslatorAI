@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import TextList from './components/TextList.vue'
 import TranslationAssistant from './components/TranslationAssistant.vue'
-import { store } from './store.js'
+import { store, settings } from './store.js'
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
@@ -34,7 +34,6 @@ function onTranslateAll() {
     addQueue(data)
     textlistRef.value.setLineLoading(data, true)
   })
-
 }
 
 
@@ -64,6 +63,11 @@ function run(){
       chatRef.value.addUserLine(question_id, data.key, data.originText)
       chatRef.value.addAssistantLine(question_id, data.key)
       window.api.translateChunk({
+        api: "ollama",
+        host: settings.value.ollama_host,
+        model: settings.value.ollama_model,
+        temperature: settings.value.ollama_temperature,
+        history: history(),
         question_id: question_id,
         key: data.key,
         originText: data.originText
@@ -71,6 +75,18 @@ function run(){
     }
     send()
   }
+}
+
+function history() {
+  const messages = []
+  const message = (role, content)=>{
+    return {
+      role: role,
+      content: content
+    }
+  }
+  messages.push(message('system', settings.value.system_prompt))
+  return messages;
 }
 
 function onTranslateStop(){
@@ -86,6 +102,7 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     run()
   }
 })
+
 </script>
 
 <template>

@@ -163,12 +163,18 @@ ipcMain.handle('ollama:list', async (e, data)=>{
 })
 
 ipcMain.on('translate:chunk', async (e, data) => {
-  const stream = translator.translateStream(data.originText)
+  const ollama = new TranslateOllama({
+    host: data.host,
+    model: data.model,
+    maxRetries: 3
+  })
+
+  const stream = ollama.translateStream(data.originText, data.history)
   for await (const chunk of stream) {
     var result = { ...data, ...{
       done: chunk.done,
       chunk: chunk.partial
-    } }
+    }}
     win.webContents.send('onTranslateChunk', result)
   }
 
