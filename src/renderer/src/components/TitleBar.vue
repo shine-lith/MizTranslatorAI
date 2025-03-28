@@ -61,7 +61,13 @@ function onWindowClose() {
 }
 
 // 显示设置
-function showPreference() {}
+function showPreference() {
+  if(window.location.hash!="#/preference"){
+    window.location.replace("#/preference")
+  }else{
+    window.location.replace("#/")
+  }
+}
 </script>
 
 <template>
