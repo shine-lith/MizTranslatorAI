@@ -47,13 +47,7 @@ var dbAdapter = new FileSync(FILE_DB, {
   deserialize: (data) => JSON.parse(data)
 })
 var db = low(dbAdapter)
-
-
-const translator = new TranslateOllama({
-  host: 'http://192.168.1.12:11434',
-  model: 'huihui_ai/qwq-abliterated:latest',
-  maxRetries: 3
-})
+var translator = null;
 
 function createWindow(): void {
   // 设置Menu
@@ -153,9 +147,19 @@ ipcMain.handle('translate:single', async (e, data)=> {
   return result.result
 })
 
-ipcMain.handle('ollama:list', async (e)=>{
-  const result = await translator.getModelList()
-  return result
+// 访问ollama api 获取已有模型列表
+ipcMain.handle('ollama:list', async (e, data)=>{
+  const ollama = new TranslateOllama({
+      host: data.host,
+      maxRetries: 1
+  })
+  try {
+    const result = await ollama.getModelList()
+    return result
+  } catch( error ){
+    notification("获取列表失败","",null)
+    return null
+  }
 })
 
 ipcMain.on('translate:chunk', async (e, data) => {

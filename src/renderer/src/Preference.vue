@@ -12,10 +12,18 @@ import Slider from 'primevue/slider'
 const ollamaModels = ref()
 // 刷新Ollama模型列表
 async function onOllamaList() {
-    const result = await window.api.onOllamaList()
-    let models = result.models.map(e=>e.name)
-    ollamaModels.value = models
-    settings.value.ollama_model_list = JSON.stringify(models)
+    // 清空列表与持久化
+    ollamaModels.value = null
+    settings.value.ollama_model_list = null
+    // 请求列表
+    const result = await window.api.onOllamaList({
+        host: settings.value.ollama_host
+    })
+    if(result){
+        let models = result.models.map(e=>e.name)
+        ollamaModels.value = models
+        settings.value.ollama_model_list = JSON.stringify(models)
+    }
 }
 
 onMounted(() => {
@@ -50,7 +58,7 @@ onMounted(() => {
                 
                 <label for="ollama_model">模型</label>
                 <div class="flex gap-5">
-                    <Select id="ollama_model" v-model="settings.ollama_model" :options="ollamaModels" placeholder="选择一个模型" checkmark :highlightOnSelect="false" class="w-full md:w-56" />
+                    <Select id="ollama_model" v-model="settings.ollama_model" :options="ollamaModels" placeholder="选择一个模型" checkmark :highlightOnSelect="false" class="w-full md:w-56" emptyMessage="无"/>
                     <Button :disabled="settings.ollama_host == ''" @click="onOllamaList" label="刷新模型列表" severity="secondary" />
                 </div>
 

@@ -13,7 +13,7 @@ const api = {
   onExportToMiz: () => ipcRenderer.send('titlebar:exportToMiz'),
   translateSingle: (data) => ipcRenderer.invoke('translate:single', data),
   translateChunk: (data) => ipcRenderer.send('translate:chunk', data),
-  onOllamaList: () => ipcRenderer.invoke('ollama:list')
+  onOllamaList: (data) => ipcRenderer.invoke('ollama:list', data)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
