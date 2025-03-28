@@ -124,6 +124,7 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
         <h1 class="font-semibold text-sm">LLM</h1>
         <p class="text-sm">Ollama - DeepSeek-r1:32b</p>
       </div>
+      <Button v-show="!isQueueRunning" class="p-1" @click="" label="" icon="pi pi-delete-left" variant="text" ></Button>
       <Button v-show="!isQueueRunning" class="p-1" @click="onTranslateAll" label="翻译所有" icon="pi pi-bolt" variant="text" >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
           <path d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z" />
