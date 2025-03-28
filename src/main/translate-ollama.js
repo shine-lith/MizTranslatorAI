@@ -13,47 +13,10 @@ class TranslateOllama {
   constructor(config = {}) {
     // 合并配置
     this.config = { ...DEFAULT_CONFIG, ...config }
-
     // 初始化Ollama实例
     this.ollama = new Ollama({
       host: this.config.host
     })
-
-    this.tasks = []
-    this.isRunning = false
-  }
-
-  addTask(text, callback){
-    var task = {
-      text: text,
-      callback: callback
-    }
-
-    this.tasks.push(task)
-    console.log('PUSH TASK: ' + text)
-    if(!this.isRunning){
-      this.run()
-    }
-  }
-
-  async run(){
-    this.isRunning = true
-    const task = this.tasks[0]
-
-    console.log('RUN TASK: ' + task.text)
-    const stream = await this.translateStreamFake(task.text)
-    task.callback(stream)
-  }
-
-  loop(){
-    this.tasks.shift()
-    // if need stoped
-
-    if(this.tasks.length > 0 ){
-      this.run()
-    }else{
-      this.isRunning = false
-    }
   }
 
   // 带重试和超时的请求核心方法
@@ -174,6 +137,7 @@ class TranslateOllama {
     }
   }
 
+  // 获取ollama安装的模型
   getModelList() {
     return this.ollama.list()
   }
