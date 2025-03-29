@@ -1,8 +1,12 @@
 <script setup>
 import { ref,nextTick } from 'vue'
+import { settings } from '../store.js'
+
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import ChatBubble from './ChatBubble.vue'
+import Dialog from 'primevue/dialog';
+import Textarea from 'primevue/textarea';
 
 defineExpose({
   addUserLine,
@@ -21,6 +25,8 @@ const chatLoading = ref(false)
 const componentList = ref([])
 const counter = ref(0)
 const componentContainer = ref(null)
+const dialog_editSystemPrompt_show = ref(false)
+const dialog_editSystemPrompt_value = ref(null)
 
 // 发送用户输入的问题到LLM询问队列
 function onChatSend(){
@@ -99,6 +105,18 @@ function scrollToBottom(force = false) {
   }
 };
 
+// 显示系统提示此编辑框
+function dialogEditSystemPromptShow() {
+  dialog_editSystemPrompt_show.value = true
+  dialog_editSystemPrompt_value.value = settings.value.system_prompt
+}
+
+// 保存系统提示此编辑框
+function dialogEditSystemPromptSave() {
+  dialog_editSystemPrompt_show.value = false
+  settings.value.system_prompt = dialog_editSystemPrompt_value.value
+}
+
 // 监听翻译的流
 window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
   var com = componentList.value.find((comp)=> comp.props.type == 'assistant' && comp.props.question_id == data.question_id)
@@ -124,7 +142,8 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
         <h1 class="font-semibold text-sm">LLM</h1>
         <p class="text-sm">Ollama - DeepSeek-r1:32b</p>
       </div>
-      <Button v-show="!isQueueRunning" class="p-1" @click="" label="" icon="pi pi-delete-left" variant="text" ></Button>
+      <Button class="p-1" @click="dialogEditSystemPromptShow" label="" icon="pi pi-wrench" variant="text"></Button>
+      <Button class="p-1" @click="" label="" icon="pi pi-delete-left" variant="text" ></Button>
       <Button v-show="!isQueueRunning" class="p-1" @click="onTranslateAll" label="翻译所有" icon="pi pi-bolt" variant="text" >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
           <path d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z" />
@@ -156,6 +175,21 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
       :icon="chatLoading?'pi pi-spin pi-spinner':'pi pi-arrow-up'"
       size="small"
       :disabled="chatLoading"
-    />
+    ></Button>
   </div>
+
+  <Dialog v-model:visible="dialog_editSystemPrompt_show" modal header="Header" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+    <template #header>
+      <div class="inline-flex items-center justify-center gap-2">
+          <span class="font-bold whitespace-nowrap">系统提示词设置</span>
+      </div>
+    </template>
+      <div>
+        <Textarea class="w-[100%]" id="system_prompt" v-model="dialog_editSystemPrompt_value" autoResize variant="filled" />
+      </div>
+    <template #footer>
+      <Button label="确定" outlined severity="secondary" @click="dialogEditSystemPromptSave" autofocus />
+    </template>
+</Dialog>
+
 </template>
