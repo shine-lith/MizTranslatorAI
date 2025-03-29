@@ -11,10 +11,11 @@ import Textarea from 'primevue/textarea';
 defineExpose({
   addUserLine,
   addAssistantLine,
+  getMessageHistory,
   scrollToBottom,
 })
 
-defineProps({
+const props = defineProps({
   isQueueRunning: Boolean
 })
 
@@ -22,6 +23,7 @@ const emit = defineEmits(['onLineSend','onTranslateAll','onTranslateStop'])
 
 const chatInput = ref(null)
 const chatLoading = ref(false)
+const messageList = []
 const componentList = ref([])
 const counter = ref(0)
 const componentContainer = ref(null)
@@ -51,6 +53,11 @@ function onTranslateAll(){
 
 function onTranslateStop(){
   emit('onTranslateStop')
+}
+
+// 返回历史消息
+function getMessageHistory() {
+  return messageList
 }
 
 // 添加用户输入行
@@ -119,16 +126,31 @@ function dialogEditSystemPromptSave() {
 
 // 监听翻译的流
 window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
-  var com = componentList.value.find((comp)=> comp.props.type == 'assistant' && comp.props.question_id == data.question_id)
-  if (com) {
-    com.props.message += data.chunk
+  var assi = componentList.value.find((comp)=> comp.props.type == 'assistant' && comp.props.question_id == data.question_id)
+  var user = componentList.value.find((comp)=> comp.props.type == 'user' && comp.props.question_id == data.question_id)
+
+  if (assi) {
+    assi.props.message += data.chunk
     if(data.done){
-      com.props.loading = false
+      assi.props.loading = false
     }
     scrollToBottom()
   }
+
   if(data.done){
     chatLoading.value = false
+    if(user){ // 将用户问题保存到历史消息列表
+      messageList.push({
+        type: 'user',
+        message: user.props.message
+      })
+    }
+    if (assi) { // 将LLM回答保存到历史消息列表
+      messageList.push({
+        type: 'assistant',
+        message: assi.props.message
+      })
+    }
   }
 })
 
@@ -140,7 +162,12 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     <div class="h-8 flex items-center">
       <div class="p-2 flex-1 flex gap-2">
         <h1 class="font-semibold text-sm">LLM</h1>
-        <p class="text-sm">Ollama - DeepSeek-r1:32b</p>
+        <p class="text-sm flex gap-2">
+          <span v-show="settings.ollama_host !== ''">
+            <span>Ollama</span>
+            <span v-show="settings.ollama_model !== ''"> - {{ settings.ollama_model }}</span>
+          </span>
+        </p>
       </div>
       <Button class="p-1" @click="dialogEditSystemPromptShow" label="" icon="pi pi-wrench" variant="text"></Button>
       <Button class="p-1" @click="" label="" icon="pi pi-delete-left" variant="text" ></Button>

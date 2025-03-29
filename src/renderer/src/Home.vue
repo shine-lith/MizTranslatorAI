@@ -17,11 +17,6 @@ var llmTasks = []
 const isQueueRunning = ref(false)
 var interrupt = false
 
-// 显示通知
-window.electron.ipcRenderer.on('onNotification', (e, message, data) => {
-  toast.add({ severity: 'secondary', summary: message.msg, detail: message.desc, life: 3000 })
-})
-
 // 向LLM询问
 function onLineSend(data) {
   addQueue(data)
@@ -77,6 +72,7 @@ function run(){
   }
 }
 
+// 构建上下文
 function history() {
   const messages = []
   const message = (role, content)=>{
@@ -85,10 +81,13 @@ function history() {
       content: content
     }
   }
+  const history = chatRef.value.getMessageHistory()
+  
   messages.push(message('system', settings.value.system_prompt))
   return messages;
 }
 
+// 停止翻译
 function onTranslateStop(){
   interrupt = true
   llmTasks = []
@@ -101,6 +100,11 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     llmTasks.shift()
     run()
   }
+})
+
+// 显示通知
+window.electron.ipcRenderer.on('onNotification', (e, message, data) => {
+  toast.add({ severity: 'secondary', summary: message.msg, detail: message.desc, life: 3000 })
 })
 
 </script>
