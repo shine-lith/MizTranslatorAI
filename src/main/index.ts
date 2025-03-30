@@ -159,14 +159,23 @@ ipcMain.handle('ollama:list', async (e, data)=>{
   }
 })
 
+// ollama流式请求
 ipcMain.on('translate:chunk', async (e, data) => {
   const ollama = new TranslateOllama({
     host: data.host,
-    model: data.model,
     maxRetries: 3
   })
-
-  const stream = ollama.translateStream(data.originText, data.history)
+  data.context.push({ role: 'user', content: data.originText})
+  const request = {
+    model: data.model,
+    messages: data.context,
+    stream: true,
+    keep_alive: data.keep_alive,
+    options:{
+      temperature: data.temperature
+    }
+  }
+  const stream = ollama.translateStream(request)
   for await (const chunk of stream) {
     var result = { ...data, ...{
       done: chunk.done,

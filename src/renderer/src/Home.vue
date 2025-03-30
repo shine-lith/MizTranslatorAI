@@ -57,15 +57,17 @@ function run(){
       var question_id = Date.now() + Math.random().toString(36).substring(2);
       chatRef.value.addUserLine(question_id, data.key, data.originText)
       chatRef.value.addAssistantLine(question_id, data.key)
+      
       window.api.translateChunk({
         api: "ollama",
         host: settings.value.ollama_host,
         model: settings.value.ollama_model,
         temperature: settings.value.ollama_temperature,
-        history: history(),
+        context: getHistoryMessages(),
         question_id: question_id,
         key: data.key,
-        originText: data.originText
+        originText: data.originText,
+        keep_alive: '3m'
       })
     }
     send()
@@ -73,17 +75,19 @@ function run(){
 }
 
 // 构建上下文
-function history() {
+function getHistoryMessages() {
   const messages = []
-  const message = (role, content)=>{
+  const m = (role, content)=>{
     return {
       role: role,
       content: content
     }
   }
+  messages.push(m('system', settings.value.system_prompt))
   const history = chatRef.value.getMessageHistory()
-  
-  messages.push(message('system', settings.value.system_prompt))
+  if(history.length > 0){
+    history.forEach((m) => { messages.push(m) })
+  }
   return messages;
 }
 

@@ -2,11 +2,10 @@ import { Ollama } from 'ollama'
 import retry from 'async-retry'
 
 const DEFAULT_CONFIG = {
+  // ollama host
   host: 'http://127.0.0.1:11434',
-  model: 'deepseek-r1:7b',
-  maxRetries: 3, // 默认最大重试次数
-  temperature: 0.3,
-  keepAlive: '3m'
+  // 默认最大重试次数
+  maxRetries: 3, 
 }
 
 class TranslateOllama {
@@ -20,24 +19,12 @@ class TranslateOllama {
   }
 
   // 带重试和超时的请求核心方法
-  async #executeRequest(text, history, options) {
+  async #executeRequest(request) {
     try {
       return await retry(
         async (bail) => {
           try {
-            history.push({
-              role: 'user', content: text
-            })
-            const args = {
-              model: this.config.model,
-              keep_alive: this.config.keepAlive,
-              messages: history,
-              options: {
-                temperature: this.config.temperature
-              },
-              stream: options.stream
-            }
-            const response = await this.ollama.chat(args)
+            const response = await this.ollama.chat(request)
             return response
           } catch (error) {
             //bail(error) 不重试直接退出
@@ -56,19 +43,19 @@ class TranslateOllama {
   }
 
   // 标准翻译方法
-  async translate(text, options = {}) {
-    try {
-      const response = await this.#executeRequest(text, history, options)
-      return this.#parseResult(text, response)
-    } catch (error) {
-      throw new Error(`Translation failed: ${error.message}`)
-    }
-  }
+  // async translate(text, options = {}) {
+  //   try {
+  //     const response = await this.#executeRequest(text, history, options)
+  //     return this.#parseResult(text, response)
+  //   } catch (error) {
+  //     throw new Error(`Translation failed: ${error.message}`)
+  //   }
+  // }
 
   // 流式翻译方法
-  async *translateStream(text, history, options = {}) {
+  async *translateStream(request) {
     try {
-      const response = await this.#executeRequest(text, history, { ...options, stream: true })
+      const response = await this.#executeRequest(request)
       for await (const chunk of response) {
           yield this.#parseChunk(chunk)
       }
@@ -78,56 +65,56 @@ class TranslateOllama {
   }
 
   // 模拟的流式翻译方法
-  async *translateStreamFake(text, option={}){
-    try{
-      const k = 'Dictxxxx'
-      var chunks = [
-        { key:k, partial: 'RAV', done:false},
-        { key:k, partial: 'EN ', done:false},
-        { key:k, partial: '1-1', done:false},
-        { key:k, partial: '（刀', done:false},
-        { key:k, partial: '锋）', done:false},
-        { key:k, partial: '：确', done:false},
-        { key:k, partial: '认，', done:false},
-        { key:k, partial: '南方', done:false},
-        { key:k, partial: '5英', done:false},
-        { key:k, partial: '里处', done:false},
-        { key:k, partial: '有一', done:false},
-        { key:k, partial: '架加', done:false},
-        { key:k, partial: '油机', done:false},
-        { key:k, partial: '，另', done:false},
-        { key:k, partial: '一架', done:false},
-        { key:k, partial: '……', done:false},
-        { key:k, partial: '在东', done:false},
-        { key:k, partial: '方7', done:false},
-        { key:k, partial: '英里', done:false},
-        { key:k, partial: '处。', done:false},
-      ];
-      for (let i = 0; i < 5; i++) {
-        chunks = chunks.concat(chunks);
-      }
-      chunks.push({key:k, partial: '', done:true})
+  // async *translateStreamFake(text, option={}){
+  //   try{
+  //     const k = 'Dictxxxx'
+  //     var chunks = [
+  //       { key:k, partial: 'RAV', done:false},
+  //       { key:k, partial: 'EN ', done:false},
+  //       { key:k, partial: '1-1', done:false},
+  //       { key:k, partial: '（刀', done:false},
+  //       { key:k, partial: '锋）', done:false},
+  //       { key:k, partial: '：确', done:false},
+  //       { key:k, partial: '认，', done:false},
+  //       { key:k, partial: '南方', done:false},
+  //       { key:k, partial: '5英', done:false},
+  //       { key:k, partial: '里处', done:false},
+  //       { key:k, partial: '有一', done:false},
+  //       { key:k, partial: '架加', done:false},
+  //       { key:k, partial: '油机', done:false},
+  //       { key:k, partial: '，另', done:false},
+  //       { key:k, partial: '一架', done:false},
+  //       { key:k, partial: '……', done:false},
+  //       { key:k, partial: '在东', done:false},
+  //       { key:k, partial: '方7', done:false},
+  //       { key:k, partial: '英里', done:false},
+  //       { key:k, partial: '处。', done:false},
+  //     ];
+  //     for (let i = 0; i < 5; i++) {
+  //       chunks = chunks.concat(chunks);
+  //     }
+  //     chunks.push({key:k, partial: '', done:true})
       
-      for (const chunk of chunks) {
-        await new Promise(resolve => setTimeout(resolve, 10));
-        yield chunk;
-      }
-    } catch (error){
+  //     for (const chunk of chunks) {
+  //       await new Promise(resolve => setTimeout(resolve, 10));
+  //       yield chunk;
+  //     }
+  //   } catch (error){
 
-    }
-  }
+  //   }
+  // }
 
   // 解析结果
-  #parseResult(text, response) {
-    const resultText = response.message.content//.replace(/<think\b[^>]*>[\s\S]*?<\/think>/g, '')
+  // #parseResult(text, response) {
+  //   const resultText = response.message.content//.replace(/<think\b[^>]*>[\s\S]*?<\/think>/g, '')
 
-    return {
-      from: response.model,
-      raw: response.message,
-      text: text,
-      result: resultText
-    }
-  }
+  //   return {
+  //     from: response.model,
+  //     raw: response.message,
+  //     text: text,
+  //     result: resultText
+  //   }
+  // }
 
   // 解析流式数据块
   #parseChunk(chunk) {
