@@ -5,7 +5,8 @@ const DEFAULT_CONFIG = {
   // ollama host
   host: 'http://127.0.0.1:11434',
   // 默认最大重试次数
-  maxRetries: 3, 
+  maxRetries: 3,
+  maxTimeout: 5000,
 }
 
 class TranslateOllama {
@@ -34,7 +35,7 @@ class TranslateOllama {
         {
           retries: this.config.maxRetries,
           minTimeout: 1000,
-          maxTimeout: 5000,
+          maxTimeout: this.config.maxTimeout,
           factor: 2
         }
       )
