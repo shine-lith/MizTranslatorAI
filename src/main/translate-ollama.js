@@ -19,13 +19,38 @@ class TranslateOllama {
     })
   }
 
-  // 带重试和超时的请求核心方法
-  async #executeRequest(request) {
+  // 带重试和chat
+  async #chat_retry(request) {
     try {
       return await retry(
         async (bail) => {
           try {
             const response = await this.ollama.chat(request)
+            return response
+          } catch (error) {
+            //bail(error) 不重试直接退出
+            throw error
+          }
+        },
+        {
+          retries: this.config.maxRetries,
+          minTimeout: 1000,
+          maxTimeout: this.config.maxTimeout,
+          factor: 2
+        }
+      )
+    } finally {
+    }
+  }
+
+
+  // 带重试的generate
+  async #generate_retry(request) {
+    try {
+      return await retry(
+        async (bail) => {
+          try {
+            const response = await this.ollama.generate(request)
             return response
           } catch (error) {
             //bail(error) 不重试直接退出
@@ -53,12 +78,24 @@ class TranslateOllama {
   //   }
   // }
 
-  // 流式翻译方法
-  async *translateStream(request) {
+  // 上下文对话
+  async *chat(request) {
     try {
-      const response = await this.#executeRequest(request)
+      const response = await this.#chat_retry(request)
       for await (const chunk of response) {
           yield this.#parseChunk(chunk)
+      }
+    } catch (error) {
+      throw new Error(`Stream translation failed: ${error.message}`)
+    }
+  }
+
+  // 单次提问
+  async *generate(request) {
+    try {
+      const response = await this.#generate_retry(request)
+      for await (const chunk of response) {
+        yield this.#parserGenerateChunk(chunk)
       }
     } catch (error) {
       throw new Error(`Stream translation failed: ${error.message}`)
@@ -121,6 +158,13 @@ class TranslateOllama {
   #parseChunk(chunk) {
     return {
       partial: chunk.message.content,
+      done: chunk.done || false
+    }
+  }
+
+  #parserGenerateChunk(chunk) {
+    return {
+      partial: chunk.response,
       done: chunk.done || false
     }
   }

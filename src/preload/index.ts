@@ -11,8 +11,8 @@ const api = {
   onOpenFile: () => ipcRenderer.send('titlebar:openFile'),
   onSaveFile: (listdata) => ipcRenderer.send('titlebar:saveFile', listdata),
   onExportToMiz: () => ipcRenderer.send('titlebar:exportToMiz'),
-  translateSingle: (data) => ipcRenderer.invoke('translate:single', data),
-  translateChunk: (data) => ipcRenderer.send('translate:chunk', data),
+  llmGenerate: (data) => ipcRenderer.send('llm:generate', data),
+  llmChat: (data) => ipcRenderer.send('llm:chat', data),
   onOllamaList: (data) => ipcRenderer.invoke('ollama:list', data)
 }
 

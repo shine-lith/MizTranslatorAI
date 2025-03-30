@@ -58,12 +58,26 @@ function run(){
       chatRef.value.addUserLine(question_id, data.key, data.originText)
       chatRef.value.addAssistantLine(question_id, data.key)
       
-      window.api.translateChunk({
+      // window.api.llmChat({
+      //   api: "ollama",
+      //   host: settings.value.ollama_host,
+      //   model: settings.value.ollama_model,
+      //   temperature: settings.value.ollama_temperature,
+      //   context: getHistoryMessages(),
+      //   question_id: question_id,
+      //   key: data.key,
+      //   originText: data.originText,
+      //   keep_alive: '3m'
+      // })
+
+      window.api.llmGenerate({
         api: "ollama",
         host: settings.value.ollama_host,
         model: settings.value.ollama_model,
+        prompt: data.originText,
+        system: "为一个军事模拟飞行游戏进行内容翻译，将用户输入从英文翻译为中文，翻译结果尽量使用军事术语，直接返回翻译结果，不做额外解释。说话的人(:开头的)、人名、代号、呼号、编号保留英文",
+        stream: true,
         temperature: settings.value.ollama_temperature,
-        context: getHistoryMessages(),
         question_id: question_id,
         key: data.key,
         originText: data.originText,

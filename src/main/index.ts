@@ -159,12 +159,13 @@ ipcMain.handle('ollama:list', async (e, data)=>{
   }
 })
 
-// ollama流式请求
-ipcMain.on('translate:chunk', async (e, data) => {
+// ollama 对话请求
+ipcMain.on('llm:chat', async (e, data) => {
   const ollama = new TranslateOllama({
     host: data.host,
     maxRetries: 3
   })
+
   data.context.push({ role: 'user', content: data.originText})
   const request = {
     model: data.model,
@@ -175,7 +176,7 @@ ipcMain.on('translate:chunk', async (e, data) => {
       temperature: data.temperature
     }
   }
-  const stream = ollama.translateStream(request)
+  const stream = ollama.chat(request)
   for await (const chunk of stream) {
     var result = { ...data, ...{
       done: chunk.done,
@@ -184,6 +185,34 @@ ipcMain.on('translate:chunk', async (e, data) => {
     win.webContents.send('onTranslateChunk', result)
   }
 })
+
+// ollama 生成式请求
+ipcMain.on('llm:generate', async (e, data) => {
+  const ollama = new TranslateOllama({
+    host: data.host,
+    maxRetries: 3
+  })
+  const request = {
+    model: data.model,
+    prompt: data.prompt,
+    system: data.system,
+    stream: data.stream,
+    keep_alive: data.keep_alive,
+    options:{
+      temperature: data.temperature
+    }
+  }
+  const stream = ollama.generate(request)
+  for await (const chunk of stream) {
+    var result = { ...data, ...{
+      done: chunk.done,
+      chunk: chunk.partial
+    }}
+    win.webContents.send('onTranslateChunk', result)
+  }
+})
+
+
 
 ipcMain.on('dev:devFunction', () => {
   console.log('devFunction')
