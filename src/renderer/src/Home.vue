@@ -25,26 +25,25 @@ function onLineSend(data) {
 // 自动翻译所有
 function onTranslateAll() {
   //todo add all store.data to list
-  store.listdata.forEach(data => {
+  store.listdata.forEach((data) => {
     addQueue(data)
     textlistRef.value.setLineLoading(data, true)
   })
 }
 
-
 // 向LLM交互队列里添加任务
-function addQueue(data){
+function addQueue(data) {
   llmTasks.push(data)
   interrupt = false
-  if(!isQueueRunning.value){
+  if (!isQueueRunning.value) {
     run()
   }
 }
 
 // 执行队列
-function run(){
-  if(interrupt || llmTasks.length <= 0) {
-    store.listdata.forEach(data => {
+function run() {
+  if (interrupt || llmTasks.length <= 0) {
+    store.listdata.forEach((data) => {
       textlistRef.value.setLineLoading(data, false)
     })
     isQueueRunning.value = false
@@ -52,12 +51,12 @@ function run(){
   } else {
     isQueueRunning.value = true
     const data = llmTasks[0]
-    const send = async ()=> {
+    const send = async () => {
       // 向底层发送流式翻译请求
-      var question_id = Date.now() + Math.random().toString(36).substring(2);
+      var question_id = Date.now() + Math.random().toString(36).substring(2)
       chatRef.value.addUserLine(question_id, data.key, data.originText)
       chatRef.value.addAssistantLine(question_id, data.key)
-      
+
       // window.api.llmChat({
       //   api: "ollama",
       //   host: settings.value.ollama_host,
@@ -71,11 +70,12 @@ function run(){
       // })
 
       window.api.llmGenerate({
-        api: "ollama",
+        api: 'ollama',
         host: settings.value.ollama_host,
         model: settings.value.ollama_model,
         prompt: data.originText,
-        system: "为一个军事模拟飞行游戏进行内容翻译，将用户输入从英文翻译为中文，翻译结果尽量使用军事术语，直接返回翻译结果，不做额外解释。说话的人(:开头的)、人名、代号、呼号、编号保留英文",
+        system:
+          '为一个军事模拟飞行游戏进行内容翻译，将用户输入从英文翻译为中文，翻译结果尽量使用军事术语，直接返回翻译结果，不做额外解释。说话的人(:开头的)、人名、代号、呼号、编号保留英文',
         stream: true,
         temperature: settings.value.ollama_temperature,
         question_id: question_id,
@@ -91,7 +91,7 @@ function run(){
 // 构建上下文
 function getHistoryMessages() {
   const messages = []
-  const m = (role, content)=>{
+  const m = (role, content) => {
     return {
       role: role,
       content: content
@@ -99,14 +99,16 @@ function getHistoryMessages() {
   }
   messages.push(m('system', settings.value.system_prompt))
   const history = chatRef.value.getMessageHistory()
-  if(history.length > 0){
-    history.forEach((m) => { messages.push(m) })
+  if (history.length > 0) {
+    history.forEach((m) => {
+      messages.push(m)
+    })
   }
-  return messages;
+  return messages
 }
 
 // 停止翻译
-function onTranslateStop(){
+function onTranslateStop() {
   interrupt = true
   llmTasks = []
 }
@@ -114,7 +116,7 @@ function onTranslateStop(){
 // 监听翻译的流
 window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
   // 如果是流传输完毕则启动下一个任务
-  if(data.done){
+  if (data.done) {
     llmTasks.shift()
     run()
   }
@@ -124,25 +126,30 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
 window.electron.ipcRenderer.on('onNotification', (e, message, data) => {
   toast.add({ severity: 'secondary', summary: message.msg, detail: message.desc, life: 3000 })
 })
-
 </script>
 
 <template>
-    <div class="flex-1 flex overflow-hidden">
-      <Splitter
-        class="flex-1 flex overflow-hidden"
-        gutterSize=1
-        stateKey="main_side_splitter"
-        stateStorage="local"
-        layout="vertical"
-      >
-        <SplitterPanel class="flex-1 overflow-y-auto">
-          <TextList ref="textlistRef" @onLineSend="onLineSend"/>
-        </SplitterPanel>
-        <SplitterPanel class="flex-1 flex flex-col">
-          <TranslationAssistant ref="chatRef" :isQueueRunning="isQueueRunning" @onLineSend="onLineSend" @onTranslateAll="onTranslateAll" @onTranslateStop="onTranslateStop"/>
-        </SplitterPanel>
-      </Splitter>
-    </div>
-    <Toast />
+  <div class="flex-1 flex overflow-hidden">
+    <Splitter
+      class="flex-1 flex overflow-hidden"
+      gutterSize="1"
+      stateKey="main_side_splitter"
+      stateStorage="local"
+      layout="vertical"
+    >
+      <SplitterPanel class="flex-1 overflow-y-auto">
+        <TextList ref="textlistRef" @onLineSend="onLineSend" />
+      </SplitterPanel>
+      <SplitterPanel class="flex-1 flex flex-col">
+        <TranslationAssistant
+          ref="chatRef"
+          :isQueueRunning="isQueueRunning"
+          @onLineSend="onLineSend"
+          @onTranslateAll="onTranslateAll"
+          @onTranslateStop="onTranslateStop"
+        />
+      </SplitterPanel>
+    </Splitter>
+  </div>
+  <Toast />
 </template>

@@ -6,7 +6,7 @@ const DEFAULT_CONFIG = {
   host: 'http://127.0.0.1:11434',
   // 默认最大重试次数
   maxRetries: 3,
-  maxTimeout: 5000,
+  maxTimeout: 5000
 }
 
 class TranslateOllama {
@@ -42,7 +42,6 @@ class TranslateOllama {
     } finally {
     }
   }
-
 
   // 带重试的generate
   async #generate_retry(request) {
@@ -83,7 +82,7 @@ class TranslateOllama {
     try {
       const response = await this.#chat_retry(request)
       for await (const chunk of response) {
-          yield this.#parseChunk(chunk)
+        yield this.#parseChunk(chunk)
       }
     } catch (error) {
       throw new Error(`Stream translation failed: ${error.message}`)
@@ -132,7 +131,7 @@ class TranslateOllama {
   //       chunks = chunks.concat(chunks);
   //     }
   //     chunks.push({key:k, partial: '', done:true})
-      
+
   //     for (const chunk of chunks) {
   //       await new Promise(resolve => setTimeout(resolve, 10));
   //       yield chunk;

@@ -31,7 +31,6 @@ function onSaveFile() {
     window.api.onSaveFile(JSON.stringify(store.listdata))
   }
 }
-
 </script>
 
 <template>

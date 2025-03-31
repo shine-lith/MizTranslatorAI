@@ -82,7 +82,7 @@ function createWindow(): void {
   win.webContents.on('did-finish-load', () => {
     // for dev auto run something
     loadMizFile('./demo.miz')
-  });
+  })
 
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
@@ -128,8 +128,6 @@ app.on('window-all-closed', () => {
   }
 })
 
-
-
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 // ipcMain.handle('translate:single', async (e, data)=> {
@@ -145,16 +143,16 @@ app.on('window-all-closed', () => {
 // })
 
 // 访问ollama api 获取已有模型列表
-ipcMain.handle('ollama:list', async (e, data)=>{
+ipcMain.handle('ollama:list', async (e, data) => {
   const ollama = new TranslateOllama({
-      host: data.host,
-      maxRetries: 1
+    host: data.host,
+    maxRetries: 1
   })
   try {
     const result = await ollama.getModelList()
     return result
-  } catch( error ){
-    notification("获取列表失败","",null)
+  } catch (error) {
+    notification('获取列表失败', '', null)
     return null
   }
 })
@@ -166,22 +164,25 @@ ipcMain.on('llm:chat', async (e, data) => {
     maxRetries: 3
   })
 
-  data.context.push({ role: 'user', content: data.originText})
+  data.context.push({ role: 'user', content: data.originText })
   const request = {
     model: data.model,
     messages: data.context,
     stream: true,
     keep_alive: data.keep_alive,
-    options:{
+    options: {
       temperature: data.temperature
     }
   }
   const stream = ollama.chat(request)
   for await (const chunk of stream) {
-    var result = { ...data, ...{
-      done: chunk.done,
-      chunk: chunk.partial
-    }}
+    var result = {
+      ...data,
+      ...{
+        done: chunk.done,
+        chunk: chunk.partial
+      }
+    }
     win.webContents.send('onTranslateChunk', result)
   }
 })
@@ -198,21 +199,22 @@ ipcMain.on('llm:generate', async (e, data) => {
     system: data.system,
     stream: data.stream,
     keep_alive: data.keep_alive,
-    options:{
+    options: {
       temperature: data.temperature
     }
   }
   const stream = ollama.generate(request)
   for await (const chunk of stream) {
-    var result = { ...data, ...{
-      done: chunk.done,
-      chunk: chunk.partial
-    }}
+    var result = {
+      ...data,
+      ...{
+        done: chunk.done,
+        chunk: chunk.partial
+      }
+    }
     win.webContents.send('onTranslateChunk', result)
   }
 })
-
-
 
 ipcMain.on('dev:devFunction', () => {
   console.log('devFunction')
@@ -307,116 +309,115 @@ async function openFile() {
 function loadMizFile(file) {
   yauzl.open(file, { lazyEntries: true }, (err, zipfile) => {
     if (err) {
-      handleError('无法打开此文件', '因为文件格式存在问题', 'Cant read miz like zip');
-      return;
+      handleError('无法打开此文件', '因为文件格式存在问题', 'Cant read miz like zip')
+      return
     }
     // 关闭文件的逻辑
-    let foundTarget = false;
+    let foundTarget = false
     const cleanup = () => {
       if (zipfile) {
-        zipfile.close();
+        zipfile.close()
       }
-    };
+    }
 
     // 打开dictionary文件
     zipfile.on('entry', (entry) => {
       if (entry.fileName === 'l10n/DEFAULT/dictionary') {
-        foundTarget = true;
-        processDictionary(zipfile, entry, file, cleanup);
+        foundTarget = true
+        processDictionary(zipfile, entry, file, cleanup)
       } else {
-        zipfile.readEntry();
+        zipfile.readEntry()
       }
-    });
+    })
 
-    // 
+    //
     zipfile.on('end', () => {
       if (!foundTarget) {
-        handleError('无效的任务文件', '缺少必要的字典文件', 'Missing l10n/DEFAULT/dictionary');
-        cleanup();
+        handleError('无效的任务文件', '缺少必要的字典文件', 'Missing l10n/DEFAULT/dictionary')
+        cleanup()
       }
-    });
+    })
 
-    zipfile.readEntry();
-  });
+    zipfile.readEntry()
+  })
 }
 
 // 专用错误处理函数
 function handleError(title, message, debugMsg) {
-  win.webContents.send('onMizOpen', 400);
-  clearProjectWorkPath();
-  notification(title, message, null);
-  debugInfo(debugMsg);
+  win.webContents.send('onMizOpen', 400)
+  clearProjectWorkPath()
+  notification(title, message, null)
+  debugInfo(debugMsg)
 }
 
 // 处理字典文件的核心逻辑
 function processDictionary(zipfile, entry, file, cleanup) {
   zipfile.openReadStream(entry, (err, readStream) => {
     if (err) {
-      handleError('无法打开此文件', '文件可能已损坏', 'Cant read l10n/DEFAULT/dictionary');
-      cleanup();
-      return;
+      handleError('无法打开此文件', '文件可能已损坏', 'Cant read l10n/DEFAULT/dictionary')
+      cleanup()
+      return
     }
     // 分块载入内容
-    const chunks = [];
-    readStream.on('data', (chunk) => chunks.push(chunk));
+    const chunks = []
+    readStream.on('data', (chunk) => chunks.push(chunk))
     readStream.on('end', () => {
       try {
-        const fullContent = Buffer.concat(chunks).toString('utf8');
-        const listData = processContent(fullContent);
-        sendSuccess(file, listData);
+        const fullContent = Buffer.concat(chunks).toString('utf8')
+        const listData = processContent(fullContent)
+        sendSuccess(file, listData)
       } catch (e) {
-        handleError('文件解析失败', '内容格式不符合要求', `Parse error: ${e.message}`);
+        handleError('文件解析失败', '内容格式不符合要求', `Parse error: ${e.message}`)
       } finally {
-        cleanup();
+        cleanup()
       }
-    });
+    })
 
     readStream.on('error', (err) => {
-      handleError('读取文件失败', '数据流异常中断', `Stream error: ${err.message}`);
-      cleanup();
-    });
-  });
+      handleError('读取文件失败', '数据流异常中断', `Stream error: ${err.message}`)
+      cleanup()
+    })
+  })
 }
 
 // 处理内容解析
 function processContent(content) {
-  const listData = loadLua(content).filter(line => {
-    const r = line.key.match(/DictKey_(.*)_\d+/);
-    const type = r ? r[1] : 'Text';
-    line.type = TYPE_MAPSETTING[type]?.text || type;
-    return TYPE_MAPSETTING[type] ? TYPE_MAPSETTING[type].keep : true;
-  });
+  const listData = loadLua(content).filter((line) => {
+    const r = line.key.match(/DictKey_(.*)_\d+/)
+    const type = r ? r[1] : 'Text'
+    line.type = TYPE_MAPSETTING[type]?.text || type
+    return TYPE_MAPSETTING[type] ? TYPE_MAPSETTING[type].keep : true
+  })
 
-  listData.forEach(line => {
+  listData.forEach((line) => {
     line.translateText = ''
-    line.translateStamp = md5(line.originText);   // 添加翻译标识
-  });
+    line.translateStamp = md5(line.originText) // 添加翻译标识
+  })
 
   // 合并翻译数据
-  const tranData = loadTranFile();
+  const tranData = loadTranFile()
   if (tranData) {
-    listData.forEach(line => {
-      const tranLine = tranData.find(item => item.key === line.key);
+    listData.forEach((line) => {
+      const tranLine = tranData.find((item) => item.key === line.key)
       if (tranLine) {
-        line.translateText = tranLine.translateText;
-        line.translateStamp = tranLine.translateStamp;
+        line.translateText = tranLine.translateText
+        line.translateStamp = tranLine.translateStamp
       }
-    });
+    })
   }
 
-  return listData;
+  return listData
 }
 
 // 成功处理
 function sendSuccess(file, listData) {
-  setProjectWorkPath(file);
+  setProjectWorkPath(file)
   win.webContents.send('onMizOpen', 200, {
     mizFile: file,
     projectPath: projectPath,
     data: listData
-  });
+  })
 }
-
 
 // 清空工作区路径
 function clearProjectWorkPath() {

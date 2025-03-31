@@ -1,25 +1,25 @@
 <script setup>
-import { ref,nextTick } from 'vue'
+import { ref, nextTick } from 'vue'
 import { settings } from '../store.js'
 
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import ChatBubble from './ChatBubble.vue'
-import Dialog from 'primevue/dialog';
-import Textarea from 'primevue/textarea';
+import Dialog from 'primevue/dialog'
+import Textarea from 'primevue/textarea'
 
 defineExpose({
   addUserLine,
   addAssistantLine,
   getMessageHistory,
-  scrollToBottom,
+  scrollToBottom
 })
 
 const props = defineProps({
   isQueueRunning: Boolean
 })
 
-const emit = defineEmits(['onLineSend','onTranslateAll','onTranslateStop'])
+const emit = defineEmits(['onLineSend', 'onTranslateAll', 'onTranslateStop'])
 
 const chatInput = ref(null)
 const chatLoading = ref(false)
@@ -31,11 +31,11 @@ const dialog_editSystemPrompt_show = ref(false)
 const dialog_editSystemPrompt_value = ref(null)
 
 // 发送用户输入的问题到LLM询问队列
-function onChatSend(){
-  if(chatLoading.value){
+function onChatSend() {
+  if (chatLoading.value) {
     return
   }
-  if(!chatInput.value){
+  if (!chatInput.value) {
     return
   }
   const data = {
@@ -47,11 +47,11 @@ function onChatSend(){
   emit('onLineSend', data)
 }
 
-function onTranslateAll(){
+function onTranslateAll() {
   emit('onTranslateAll')
 }
 
-function onTranslateStop(){
+function onTranslateStop() {
   emit('onTranslateStop')
 }
 
@@ -61,7 +61,7 @@ function getMessageHistory() {
 }
 
 // 添加用户输入行
-async function addUserLine(question_id, dictkey, text){
+async function addUserLine(question_id, dictkey, text) {
   componentList.value.push({
     id: ++counter.value,
     name: 'ChatBubble', // 必须已注册
@@ -69,7 +69,7 @@ async function addUserLine(question_id, dictkey, text){
       type: 'user',
       message: text,
       dictkey: dictkey,
-      question_id: question_id 
+      question_id: question_id
     }
   })
   await nextTick() // 确保DOM先执行更新，然后设置滚动条
@@ -86,7 +86,7 @@ async function addAssistantLine(question_id, dictkey) {
       type: 'assistant',
       message: '',
       question_id: question_id,
-      loading: true,
+      loading: true
     }
   })
   await nextTick() // 确保DOM先执行更新，然后设置滚动条
@@ -99,18 +99,18 @@ function removeComponent(id) {
 
 // 滚动到最底部
 function scrollToBottom(force = false) {
-  const el = componentContainer.value;
+  const el = componentContainer.value
   if (force) {
-    el.scrollTop = el.scrollHeight;
+    el.scrollTop = el.scrollHeight
     return
   }
   const threshold = 20 // 允许的误差范围
   // 判断是否接近底部
-  const isNearBottom = el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+  const isNearBottom = el.scrollHeight - el.clientHeight - el.scrollTop <= threshold
   if (isNearBottom) {
-    el.scrollTop = el.scrollHeight;
+    el.scrollTop = el.scrollHeight
   }
-};
+}
 
 // 显示系统提示此编辑框
 function dialogEditSystemPromptShow() {
@@ -126,26 +126,32 @@ function dialogEditSystemPromptSave() {
 
 // 监听翻译的流
 window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
-  var assi = componentList.value.find((comp)=> comp.props.type == 'assistant' && comp.props.question_id == data.question_id)
-  var user = componentList.value.find((comp)=> comp.props.type == 'user' && comp.props.question_id == data.question_id)
+  var assi = componentList.value.find(
+    (comp) => comp.props.type == 'assistant' && comp.props.question_id == data.question_id
+  )
+  var user = componentList.value.find(
+    (comp) => comp.props.type == 'user' && comp.props.question_id == data.question_id
+  )
 
   if (assi) {
     assi.props.message += data.chunk
-    if(data.done){
+    if (data.done) {
       assi.props.loading = false
     }
     scrollToBottom()
   }
 
-  if(data.done){
+  if (data.done) {
     chatLoading.value = false
-    if(user){ // 将用户问题保存到历史消息列表
+    if (user) {
+      // 将用户问题保存到历史消息列表
       messageList.push({
         type: 'user',
         message: user.props.message
       })
     }
-    if (assi) { // 将LLM回答保存到历史消息列表
+    if (assi) {
+      // 将LLM回答保存到历史消息列表
       messageList.push({
         type: 'assistant',
         message: assi.props.message
@@ -153,7 +159,6 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     }
   }
 })
-
 </script>
 
 <template>
@@ -169,16 +174,49 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
           </span>
         </p>
       </div>
-      <Button class="p-1" @click="dialogEditSystemPromptShow" label="" icon="pi pi-wrench" variant="text"></Button>
-      <Button class="p-1" @click="" label="" icon="pi pi-delete-left" variant="text" ></Button>
-      <Button v-show="!isQueueRunning" class="p-1" @click="onTranslateAll" label="翻译所有" icon="pi pi-bolt" variant="text" >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-          <path d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z" />
+      <Button
+        class="p-1"
+        @click="dialogEditSystemPromptShow"
+        label=""
+        icon="pi pi-wrench"
+        variant="text"
+      ></Button>
+      <Button class="p-1" @click="" label="" icon="pi pi-delete-left" variant="text"></Button>
+      <Button
+        v-show="!isQueueRunning"
+        class="p-1"
+        @click="onTranslateAll"
+        label="翻译所有"
+        icon="pi pi-bolt"
+        variant="text"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          class="size-5"
+        >
+          <path
+            d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z"
+          />
         </svg>
       </Button>
-      <Button v-show="isQueueRunning" class="p-1" @click="onTranslateStop" label="停止"  variant="text" >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-          <path d="M5.25 3A2.25 2.25 0 0 0 3 5.25v9.5A2.25 2.25 0 0 0 5.25 17h9.5A2.25 2.25 0 0 0 17 14.75v-9.5A2.25 2.25 0 0 0 14.75 3h-9.5Z" />
+      <Button
+        v-show="isQueueRunning"
+        class="p-1"
+        @click="onTranslateStop"
+        label="停止"
+        variant="text"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          class="size-5"
+        >
+          <path
+            d="M5.25 3A2.25 2.25 0 0 0 3 5.25v9.5A2.25 2.25 0 0 0 5.25 17h9.5A2.25 2.25 0 0 0 17 14.75v-9.5A2.25 2.25 0 0 0 14.75 3h-9.5Z"
+          />
         </svg>
       </Button>
     </div>
@@ -193,30 +231,52 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     />
   </div>
   <div class="p-1 w-full backdrop-blur-sm border-t border-gray-700 flex gap-2">
-    <InputText v-model="chatInput" class="border-none flex-1" placeholder="向LLM发送消息" aria-multiline />
+    <InputText
+      v-model="chatInput"
+      class="border-none flex-1"
+      placeholder="向LLM发送消息"
+      aria-multiline
+    />
     <Button
       @click="onChatSend"
       class="m-1"
       aria-multiline
       rounded
-      :icon="chatLoading?'pi pi-spin pi-spinner':'pi pi-arrow-up'"
+      :icon="chatLoading ? 'pi pi-spin pi-spinner' : 'pi pi-arrow-up'"
       size="small"
       :disabled="chatLoading"
     ></Button>
   </div>
 
-  <Dialog v-model:visible="dialog_editSystemPrompt_show" modal header="Header" :style="{ width: '50rem' }" :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
+  <Dialog
+    v-model:visible="dialog_editSystemPrompt_show"
+    modal
+    header="Header"
+    :style="{ width: '50rem' }"
+    :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+  >
     <template #header>
       <div class="inline-flex items-center justify-center gap-2">
-          <span class="font-bold whitespace-nowrap">系统提示词设置</span>
+        <span class="font-bold whitespace-nowrap">系统提示词设置</span>
       </div>
     </template>
-      <div>
-        <Textarea class="w-[100%]" id="system_prompt" v-model="dialog_editSystemPrompt_value" autoResize variant="filled" />
-      </div>
+    <div>
+      <Textarea
+        class="w-[100%]"
+        id="system_prompt"
+        v-model="dialog_editSystemPrompt_value"
+        autoResize
+        variant="filled"
+      />
+    </div>
     <template #footer>
-      <Button label="确定" outlined severity="secondary" @click="dialogEditSystemPromptSave" autofocus />
+      <Button
+        label="确定"
+        outlined
+        severity="secondary"
+        @click="dialogEditSystemPromptSave"
+        autofocus
+      />
     </template>
-</Dialog>
-
+  </Dialog>
 </template>

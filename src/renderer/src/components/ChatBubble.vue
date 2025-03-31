@@ -8,7 +8,7 @@ const props = defineProps({
   },
   message: {
     type: String,
-    default: '',
+    default: ''
   },
   dictkey: {
     type: String,
@@ -19,7 +19,7 @@ const props = defineProps({
     required: true
   },
   loading: {
-    type: Boolean,
+    type: Boolean
   }
 })
 
@@ -29,7 +29,6 @@ const isHovering = ref(false)
 const handleResend = () => {
   emit('resend', props.message)
 }
-
 </script>
 
 <template>
@@ -43,7 +42,7 @@ const handleResend = () => {
       >
         <!-- 气泡 -->
         <div class="max-w-[100%] flex">
-          <i class="pi pi-chevron-right text-xs m-1" ></i>
+          <i class="pi pi-chevron-right text-xs m-1"></i>
           <div class="text-justify">
             <span>{{ message }}</span>
           </div>
@@ -57,10 +56,10 @@ const handleResend = () => {
     <div v-else-if="type === 'assistant'">
       <div class="flex items-start text-sm">
         <div class="max-w-[100%] flex items-start">
-          <i v-if="loading === true" class="pi pi-spin pi-spinner text-xs m-1" ></i>
-          <i v-else class="pi pi-circle text-xs m-1" ></i>
+          <i v-if="loading === true" class="pi pi-spin pi-spinner text-xs m-1"></i>
+          <i v-else class="pi pi-circle text-xs m-1"></i>
           <div class="">
-            <p v-if="message ===''">等待回复</p>
+            <p v-if="message === ''">等待回复</p>
             <p v-else>{{ message }}</p>
           </div>
         </div>
