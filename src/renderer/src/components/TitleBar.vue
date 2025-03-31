@@ -1,7 +1,10 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { store } from '../store.js'
 import Button from 'primevue/button'
+
+const router = useRouter()
 
 defineProps({
   msg: String
@@ -62,11 +65,7 @@ function onWindowClose() {
 
 // 显示设置
 function showPreference() {
-  if(window.location.hash!="#/preference"){
-    window.location.replace("#/preference")
-  }else{
-    window.location.replace("#/")
-  }
+  router.push('/preference')
 }
 </script>
 

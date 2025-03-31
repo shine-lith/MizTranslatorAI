@@ -1,23 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import TitleBar from './components/TitleBar.vue'
-import Home from './Home.vue'
-import Preference from './Preference.vue'
 import { store } from './store.js'
 
-const routes = {
-  '/': Home,
-  '/preference': Preference
-}
-const currentPath = ref(window.location.hash)
-
-window.addEventListener('hashchange', () => {
-  currentPath.value = window.location.hash
-})
-
-const currentView = computed(() => {
-  return routes[currentPath.value.slice(1) || '/'] || NotFound
-})
+const titleBarRef = ref()
 
 // 处理文件加载
 window.electron.ipcRenderer.on('onMizOpen', (e, code, data) => {
@@ -51,6 +37,6 @@ function onSaveFile() {
 <template>
   <div class="h-screen flex flex-col z-999">
     <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" />
-    <component :is="currentView" />
+    <RouterView />
   </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup>
 import { ref,onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { settings } from './store.js'
 
 import Button from 'primevue/button'
@@ -9,7 +10,13 @@ import IftaLabel from 'primevue/IftaLabel'
 import Select from 'primevue/select'
 import Slider from 'primevue/slider'
 
+const router = useRouter()
 const ollamaModels = ref()
+
+function back() {
+    router.back()
+}
+
 // 刷新Ollama模型列表
 async function onOllamaList() {
     // 清空列表与持久化
@@ -35,7 +42,7 @@ onMounted(() => {
 <template>
     <div id="preference" class="flex-col">
         <div class="flex-none">
-            <Button label="返回"></Button>
+            <Button @click="back" label="返回"></Button>
         </div>
         
         <div class="flex flex-1">
