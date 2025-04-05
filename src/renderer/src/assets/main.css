@@ -1,3 +1,10 @@
 @import 'tailwindcss';
 @import 'tailwindcss-primeui';
 @import 'primeicons/primeicons.css';
+
+* {
+    --p-button-sm-font-size: 0.9rem;
+    --p-button-border-radius:0;
+    --p-button-label-font-weight: 0;
+    --p-datatable-column-title-font-weight: 0;
+}
