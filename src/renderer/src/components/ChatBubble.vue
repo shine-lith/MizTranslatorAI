@@ -36,7 +36,7 @@ const handleResend = () => {
     <!-- 用户发送的消息 -->
     <div v-if="type === 'user'">
       <div
-        class="fly-in flex items-start text-sm"
+        class="fly-in flex items-start text-sm hover:bg-zinc-800"
         @mouseenter="isHovering = true"
         @mouseleave="isHovering = false"
       >
@@ -54,7 +54,7 @@ const handleResend = () => {
 
     <!-- 返回的消息 -->
     <div v-else-if="type === 'assistant'">
-      <div class="flex items-start text-sm">
+      <div class="flex items-start text-sm hover:bg-zinc-800">
         <div class="max-w-[100%] flex items-start">
           <i v-if="loading === true" class="pi pi-spin pi-spinner text-xs m-1"></i>
           <i v-else class="pi pi-circle text-xs m-1"></i>
