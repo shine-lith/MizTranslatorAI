@@ -382,19 +382,20 @@ function processDictionary(zipfile, entry, file, cleanup) {
 
 // 处理内容解析
 function processContent(content) {
-  const listData = loadLua(content).filter((line) => {
+  var listData = loadLua(content).filter((line) => {
     const r = line.key.match(/DictKey_(.*)_\d+/)
     const type = r ? r[1] : 'Text'
     line.type = TYPE_MAPSETTING[type]?.text || type
-
-    const no = line.key.match(/\d+/g)
-    line.no = no ? no[0] : ''
     return TYPE_MAPSETTING[type] ? TYPE_MAPSETTING[type].keep : true
   })
-
+  // 过滤掉原文为空的行
+  listData = listData.filter(line => line.originText !== '')
+  
   listData.forEach((line) => {
     line.translateText = ''
     line.translateStamp = md5(line.originText) // 添加翻译标识
+    const no = line.key.match(/\d+/g)
+    line.no = no ? no[0] : ''
   })
 
   // 合并翻译数据
