@@ -382,15 +382,9 @@ function processDictionary(zipfile, entry, file, cleanup) {
 
 // 处理内容解析
 function processContent(content) {
-  var listData = loadLua(content).filter((line) => {
-    const r = line.key.match(/DictKey_(.*)_\d+/)
-    const type = r ? r[1] : 'Text'
-    line.type = TYPE_MAPSETTING[type]?.text || type
-    return TYPE_MAPSETTING[type] ? TYPE_MAPSETTING[type].keep : true
-  })
+  var listData = loadLua(content)
   // 过滤掉原文为空的行
   listData = listData.filter(line => line.originText !== '')
-  
   listData.forEach((line) => {
     line.translateText = ''
     line.translateStamp = md5(line.originText) // 添加翻译标识
