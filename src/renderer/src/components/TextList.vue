@@ -68,13 +68,14 @@ function removeThinkTags(str) {
     selectionMode="single"
     size="small"
     stripedRows
-    resizableColumns
+    scrollable
+    scrollHeight="flex"
   >
-    <Column field="key" header="标识" sortable class="max-w-10 truncate"></Column>
-    <Column field="type" header="类型" sortable class="max-w-15 truncate"></Column>
-    <Column field="originText" header="原文" class="min-w-20 max-w-50 truncate"></Column>
-    <Column field="translateText" header="译文" class="min-w-20 max-w-50 truncate"></Column>
-    <Column class="!text-end">
+    <Column field="type" header="类型" sortable class="w-[80px] truncate"></Column>
+    <Column field="no" header="标识" sortable class="w-[40px] truncate"></Column>
+    <Column field="originText" header="原文" class="min-w-20 max-w-50"></Column>
+    <Column field="translateText" header="译文" class="min-w-20 max-w-50"></Column>
+    <Column class="w-[40px] !text-end">
       <template #body="{ data, index }">
         <!-- :icon 可以支持表达式 -->
         <Button

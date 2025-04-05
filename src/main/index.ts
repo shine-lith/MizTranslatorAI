@@ -386,6 +386,9 @@ function processContent(content) {
     const r = line.key.match(/DictKey_(.*)_\d+/)
     const type = r ? r[1] : 'Text'
     line.type = TYPE_MAPSETTING[type]?.text || type
+
+    const no = line.key.match(/\d+/g)
+    line.no = no ? no[0] : ''
     return TYPE_MAPSETTING[type] ? TYPE_MAPSETTING[type].keep : true
   })
 
