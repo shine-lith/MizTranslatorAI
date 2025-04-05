@@ -70,10 +70,10 @@ function removeThinkTags(str) {
     stripedRows
     scrollable
     scrollHeight="flex"
-    sortField="type"
+    sortField="showName"
     :sortOrder="1"
   >
-    <Column field="type" header="类型" sortable class="w-[80px] truncate"></Column>
+    <Column field="showName" header="类型" sortable class="w-[80px] truncate"></Column>
     <Column field="no" header="标识" sortable class="w-[40px] truncate"></Column>
     <Column field="originText" header="原文" class="min-w-20 max-w-20"></Column>
     <Column field="translateText" header="译文" class="min-w-20 max-w-20"></Column>

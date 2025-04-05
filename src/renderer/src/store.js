@@ -2,13 +2,31 @@
 import { reactive } from 'vue'
 import { useStorage } from '@vueuse/core'
 
+// 字符串资源类型映射/设置表
+export const miz_dictkey = {
+  sortie: { text: '1.任务名称', keep: true },
+  descriptionText: { text: '2.形势', keep: true },
+  descriptionRedTask: { text: '3.红方任务', keep: true },
+  descriptionBlueTask: { text: '4.蓝方任务', keep: true },
+  descriptionNeutralsTask: { text: '5.中立任务', keep: true },
+  WptName: { text: '路点名', keep: false },
+  UnitName: { text: '单位名', keep: false },
+  GroupName: { text: '群组名', keep: false },
+  ActionComment: { keep: false },
+  ActionRadioText: { text: '菜单项', keep: true },
+  ActionText: { text: '提示信息', keep: true },
+  subtitle: { text: '字幕', keep: true }
+}
+
 export const store = reactive({
   // miz文件的路径
   mizFile: null,
   // 工程的路径
   projectPath: null,
   // miz Dict数据
-  listdata: null
+  listdata: null,
+  // 任务信息
+  mission_data: null,
 })
 
 export const settings = useStorage('settings', {

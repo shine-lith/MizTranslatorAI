@@ -1,16 +1,33 @@
 <script setup>
 import { ref, computed } from 'vue'
 import TitleBar from './components/TitleBar.vue'
-import { store } from './store.js'
+import { store, miz_dictkey } from './store.js'
 
 const titleBarRef = ref()
 
 // 处理文件加载
 window.electron.ipcRenderer.on('onMizOpen', (e, code, data) => {
   if (code == 200) {
+    // 识别那些事任务简报信息
+    const dicts = ['descriptionText','descriptionRedTask','descriptionBlueTask'];
+    const mission_data = []
+    // 过滤掉不需要的行，识别类型
+    const datalist = data.data.filter((line) => {
+        const r = line.key.match(/DictKey_(.*)_\d+/)
+        const type = r ? r[1] : 'Text'
+        line.showName = miz_dictkey[type]?.text || type
+        // 提取简报信息
+        if (dicts.includes(type)) {
+          mission_data.push({type: type, text: line.originText})
+        }
+        return miz_dictkey[type] ? miz_dictkey[type].keep : true
+      }
+    )
+    // 过滤掉不需要的行，识别类型  
     store.mizFile = data.mizFile
     store.projectPath = data.projectPath
-    store.listdata = data.data
+    store.listdata = datalist
+    store.mission_data = mission_data
     titleBarRef.value.setTitle(`mizTranslator - ${data.mizFile}`)
   }
 })
