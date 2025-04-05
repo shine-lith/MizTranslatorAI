@@ -39,6 +39,7 @@ function onChatSend() {
     return
   }
   const data = {
+    method: 'chat',
     key: '',
     originText: chatInput.value
   }

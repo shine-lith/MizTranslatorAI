@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import TextList from './components/TextList.vue'
 import TranslationAssistant from './components/TranslationAssistant.vue'
-import { store, settings } from './store.js'
+import { store, settings, miz_dictkey} from './store.js'
 import Button from 'primevue/button'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
@@ -57,47 +57,64 @@ function run() {
       chatRef.value.addUserLine(question_id, data.key, data.originText)
       chatRef.value.addAssistantLine(question_id, data.key)
 
-      // window.api.llmChat({
-      //   api: "ollama",
-      //   host: settings.value.ollama_host,
-      //   model: settings.value.ollama_model,
-      //   temperature: settings.value.ollama_temperature,
-      //   context: getHistoryMessages(),
-      //   question_id: question_id,
-      //   key: data.key,
-      //   originText: data.originText,
-      //   keep_alive: '3m'
-      // })
-
-      window.api.llmGenerate({
-        api: 'ollama',
-        host: settings.value.ollama_host,
-        model: settings.value.ollama_model,
-        prompt: data.originText,
-        system:
-          '为一个军事模拟飞行游戏进行内容翻译，将用户输入从英文翻译为中文，翻译结果尽量使用军事术语，直接返回翻译结果，不做额外解释。说话的人(:开头的)、人名、代号、呼号、编号保留英文',
-        stream: true,
-        temperature: settings.value.ollama_temperature,
-        question_id: question_id,
-        key: data.key,
-        originText: data.originText,
-        keep_alive: '3m'
-      })
+      if(data.method === 'chat') {
+        // 向llm提问
+        window.api.llmChat({
+          api: "ollama",
+          host: settings.value.ollama_host,
+          model: settings.value.ollama_model,
+          temperature: settings.value.ollama_temperature,
+          context: getHistoryMessages(),
+          question_id: question_id,
+          key: data.key,
+          originText: data.originText,
+          keep_alive: '3m'
+        })
+      } else {
+        // llm翻译
+        window.api.llmGenerate({
+          api: 'ollama',
+          host: settings.value.ollama_host,
+          model: settings.value.ollama_model,
+          prompt: data.originText,
+          system: settings.value.system_prompt,
+          stream: true,
+          temperature: settings.value.ollama_temperature,
+          question_id: question_id,
+          key: data.key,
+          originText: data.originText,
+          keep_alive: '3m'
+        })
+      }
     }
     send()
   }
 }
 
-// 构建上下文
+// 获取chat模式下的历史消息
 function getHistoryMessages() {
   const messages = []
+  // 构建消息体
   const m = (role, content) => {
     return {
       role: role,
       content: content
     }
   }
-  messages.push(m('system', settings.value.system_prompt))
+  // chat使用的prompt，并将miz中的简报信息提供给llm
+  var chatSystemPrompt = '你是一个军事顾问，马上将要开展一次军事行动，后面会提供这次行动的一些必要信息，你需要回答用户提出的问题，使用中文进行回答。以下是这次行动的信息：\r\n'
+  store.mission_data.forEach((item)=>{
+    if(item.type=='descriptionText'){
+      chatSystemPrompt += "# 当前形势\r\n"
+    }
+    if(item.type=='descriptionRedTask' || item.type=='descriptionBlueTask'){
+      chatSystemPrompt += "# 任务说明\r\n"
+    }
+    chatSystemPrompt+=item.text
+  })
+  messages.push(m('system', chatSystemPrompt))
+
+  // 消息中添加上下文
   const history = chatRef.value.getMessageHistory()
   if (history.length > 0) {
     history.forEach((m) => {
