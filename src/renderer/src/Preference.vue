@@ -52,10 +52,16 @@ onMounted(() => {
         </ol>
       </div>
       <div class="flex-1 flex flex-col gap-2 pr-10">
-        <h2 id="setting">翻译设置</h2>
-        <label for="system_prompt">系统提示词</label>
-        <Textarea id="system_prompt" v-model="settings.system_prompt" autoResize variant="filled" />
+        <h2 id="setting">提示词设置</h2>
+        <p class="text-sm text-gray-500">
+          该示词会在问答和翻译时自动添加到问题前面，以便让LLM模型更好地理解问题
+        </p>
+        <label for="chat_prompt">问答提示词</label>
+        <Textarea id="chat_prompt" v-model="settings.chat_prompt" autoResize variant="filled" />
+        <p class="text-sm text-gray-500">{miz_data} 用来代表任务简报信息，是问答题提示词的关键内容，请勿删除</p>
 
+        <label for="translate_prompt">翻译提示词</label>
+        <Textarea id="translate_prompt" v-model="settings.translate_prompt" autoResize variant="filled" />
         <h2>Ollama</h2>
         <label for="ollama_host">API地址</label>
         <InputText

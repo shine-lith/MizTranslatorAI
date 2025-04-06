@@ -28,7 +28,9 @@ const componentList = ref([])
 const counter = ref(0)
 const componentContainer = ref(null)
 const dialog_editSystemPrompt_show = ref(false)
-const dialog_editSystemPrompt_value = ref(null)
+const dialog_editSystemPrompt_chat = ref(null)
+const dialog_editSystemPrompt_translate = ref(null)
+
 
 // 发送用户输入的问题到LLM询问队列
 function onChatSend() {
@@ -116,13 +118,15 @@ function scrollToBottom(force = false) {
 // 显示系统提示此编辑框
 function dialogEditSystemPromptShow() {
   dialog_editSystemPrompt_show.value = true
-  dialog_editSystemPrompt_value.value = settings.value.system_prompt
+  dialog_editSystemPrompt_translate.value = settings.value.translate_prompt
+  dialog_editSystemPrompt_chat.value = settings.value.chat_prompt
 }
 
 // 保存系统提示此编辑框
 function dialogEditSystemPromptSave() {
   dialog_editSystemPrompt_show.value = false
-  settings.value.system_prompt = dialog_editSystemPrompt_value.value
+  settings.value.translate_prompt = dialog_editSystemPrompt_translate.value
+  settings.value.chat_prompt = dialog_editSystemPrompt_chat.value
 }
 
 // 监听翻译的流
@@ -235,7 +239,7 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
     <InputText
       v-model="chatInput"
       class="border-none flex-1"
-      placeholder="向LLM发送消息"
+      placeholder="向LLM发送提问"
       aria-multiline
     />
     <Button
@@ -258,14 +262,21 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
   >
     <template #header>
       <div class="inline-flex items-center justify-center gap-2">
-        <span class="font-bold whitespace-nowrap">系统提示词设置</span>
+        <span class="font-bold whitespace-nowrap">提示词设置</span>
       </div>
     </template>
     <div>
       <Textarea
         class="w-[100%]"
-        id="system_prompt"
-        v-model="dialog_editSystemPrompt_value"
+        v-model="dialog_editSystemPrompt_chat"
+        autoResize
+        variant="filled"
+      />
+    </div>
+    <div>
+      <Textarea
+        class="w-[100%]"
+        v-model="dialog_editSystemPrompt_translate"
         autoResize
         variant="filled"
       />

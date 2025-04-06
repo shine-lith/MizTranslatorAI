@@ -77,7 +77,7 @@ function run() {
           host: settings.value.ollama_host,
           model: settings.value.ollama_model,
           prompt: data.originText,
-          system: settings.value.system_prompt,
+          system: settings.value.translate_prompt,
           stream: true,
           temperature: settings.value.ollama_temperature,
           question_id: question_id,
@@ -102,22 +102,24 @@ function getHistoryMessages() {
     }
   }
   // chat使用的prompt，并将miz中的简报信息提供给llm
-  var chatSystemPrompt = '你是一个军事顾问，马上将要开展一次军事行动，后面会提供这次行动的一些必要信息，你需要回答用户提出的问题，使用中文进行回答。以下是这次行动的信息：\r\n'
+  var chatSystemPrompt = settings.value.chat_prompt
+  var miz_data = ''
   store.mission_data.forEach((item)=>{
     if(item.type=='descriptionText'){
-      chatSystemPrompt += "# 当前形势\r\n"
+      miz_data += "# 当前形势\r\n"
     }
     if(item.type=='descriptionRedTask' || item.type=='descriptionBlueTask'){
-      chatSystemPrompt += "# 任务说明\r\n"
+      miz_data += "# 任务说明\r\n"
     }
-    chatSystemPrompt+=item.text
+    miz_data+=item.text
   })
+  chatSystemPrompt = chatSystemPrompt.replace(/{miz_data}/g, miz_data)
   messages.push(m('system', chatSystemPrompt))
 
   // 消息中添加上下文
   const history = chatRef.value.getMessageHistory()
   if (history.length > 0) {
-    history.forEach((m) => {
+    history.slice(0,settings.value.ollama_context_limit).forEach((m) => {
       messages.push(m)
     })
   }
