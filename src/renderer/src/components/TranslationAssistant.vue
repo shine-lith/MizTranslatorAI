@@ -1,5 +1,5 @@
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted } from 'vue'
 import { settings } from '../store.js'
 
 import InputText from 'primevue/inputtext'
@@ -130,7 +130,7 @@ function dialogEditSystemPromptSave() {
 }
 
 // 监听翻译的流
-window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
+function onTranslateChunk (e, data) {
   var assi = componentList.value.find(
     (comp) => comp.props.type == 'assistant' && comp.props.question_id == data.question_id
   )
@@ -163,6 +163,14 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
       })
     }
   }
+}
+
+onMounted(() => {
+  window.electron.ipcRenderer.on('onTranslateChunk', onTranslateChunk)
+})
+
+onUnmounted(() => {
+  window.electron.ipcRenderer.removeAllListeners('onTranslateChunk')
 })
 </script>
 

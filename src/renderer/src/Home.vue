@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import TextList from './components/TextList.vue'
 import TranslationAssistant from './components/TranslationAssistant.vue'
 import { store, settings, miz_dictkey} from './store.js'
@@ -133,17 +133,27 @@ function onTranslateStop() {
 }
 
 // 监听翻译的流
-window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
+function onTranslateChunk(e, data) {
   // 如果是流传输完毕则启动下一个任务
   if (data.done) {
     llmTasks.shift()
     run()
   }
-})
+}
 
 // 显示通知
-window.electron.ipcRenderer.on('onNotification', (e, message, data) => {
+function onNotification(e, message, data){
   toast.add({ severity: 'secondary', summary: message.msg, detail: message.desc, life: 3000 })
+}
+
+onMounted(() => {
+  window.electron.ipcRenderer.on('onTranslateChunk', onTranslateChunk)
+  window.electron.ipcRenderer.on('onNotification', onNotification)
+})
+
+onUnmounted(() => {
+  window.electron.ipcRenderer.removeAllListeners('onTranslateChunk')
+  window.electron.ipcRenderer.removeAllListeners('onNotification')
 })
 </script>
 

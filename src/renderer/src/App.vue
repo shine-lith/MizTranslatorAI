@@ -1,12 +1,12 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import TitleBar from './components/TitleBar.vue'
 import { store, miz_dictkey } from './store.js'
 
 const titleBarRef = ref()
 
 // 处理文件加载
-window.electron.ipcRenderer.on('onMizOpen', (e, code, data) => {
+function onMizOpen(e, code, data) {
   if (code == 200) {
     // 识别那些事任务简报信息
     const dicts = ['descriptionText','descriptionRedTask','descriptionBlueTask'];
@@ -30,7 +30,7 @@ window.electron.ipcRenderer.on('onMizOpen', (e, code, data) => {
     store.mission_data = mission_data
     titleBarRef.value.setTitle(`mizTranslator - ${data.mizFile}`)
   }
-})
+}
 
 // 判断miz是否加载
 function isMizLoaded() {
@@ -48,6 +48,14 @@ function onSaveFile() {
     window.api.onSaveFile(JSON.stringify(store.listdata))
   }
 }
+
+onMounted(() => {
+  window.electron.ipcRenderer.on('onMizOpen', onMizOpen)
+})
+
+onUnmounted(() => {
+  window.electron.ipcRenderer.removeAllListeners('onMizOpen')
+})
 </script>
 
 <template>

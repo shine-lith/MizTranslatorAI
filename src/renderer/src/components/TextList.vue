@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { store } from '../store.js'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
@@ -30,7 +30,7 @@ async function onLineSendButton(data, index) {
 }
 
 // 监听翻译的流
-window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
+function onTranslateChunk(e, data) {
   var line = store.listdata.find((d) => d.key == data.key)
   if (line) {
     // 更新内容
@@ -43,7 +43,7 @@ window.electron.ipcRenderer.on('onTranslateChunk', (e, data) => {
       setLineLoading(data, false)
     }
   }
-})
+}
 
 // 设置这一行的loading 状态
 function setLineLoading(data, state) {
@@ -56,6 +56,14 @@ function removeThinkTags(str) {
   const regex = /<think\b[^>]*>[\s\S]*?<\/think>/g
   return str.replace(regex, '')
 }
+
+onMounted(() => {
+  window.electron.ipcRenderer.on('onTranslateChunk', onTranslateChunk)
+})
+
+onUnmounted(() => {
+  window.electron.ipcRenderer.removeAllListeners('onTranslateChunk')
+})
 </script>
 
 <template>
