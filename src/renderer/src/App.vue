@@ -1,9 +1,10 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import TitleBar from './components/TitleBar.vue'
-import { store, miz_dictkey } from './store.js'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
+import Button from 'primevue/button'
+import TitleBar from './components/TitleBar.vue'
+import { store, miz_dictkey } from './store.js'
 
 const toast = useToast()
 const titleBarRef = ref()
@@ -54,7 +55,7 @@ function onSaveFile() {
 
 // 显示通知
 function onNotification(e, message, data){
-  toast.add({ severity: 'secondary', summary: message.msg, detail: message.desc, life: 3000 })
+  toast.add({ severity: 'secondary', summary: message.msg, detail: message.desc, life: 9000 })
 }
 
 onMounted(() => {
@@ -73,5 +74,12 @@ onUnmounted(() => {
     <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" />
     <RouterView />
   </div>
-  <Toast />
+  <Toast>
+    <template #message="slotProps">
+      <div class="flex flex-col">
+        <div class="font-medium">{{ slotProps.message.summary }}</div>
+        <div class="text-sm mb-2" @click="onReply()">{{ slotProps.message.detail }}</div>
+      </div>
+  </template>
+  </Toast>
 </template>
