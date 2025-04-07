@@ -2,7 +2,10 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import TitleBar from './components/TitleBar.vue'
 import { store, miz_dictkey } from './store.js'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
 
+const toast = useToast()
 const titleBarRef = ref()
 
 // 处理文件加载
@@ -49,12 +52,19 @@ function onSaveFile() {
   }
 }
 
+// 显示通知
+function onNotification(e, message, data){
+  toast.add({ severity: 'secondary', summary: message.msg, detail: message.desc, life: 3000 })
+}
+
 onMounted(() => {
   window.electron.ipcRenderer.on('onMizOpen', onMizOpen)
+  window.electron.ipcRenderer.on('onNotification', onNotification)
 })
 
 onUnmounted(() => {
   window.electron.ipcRenderer.removeAllListeners('onMizOpen')
+  window.electron.ipcRenderer.removeAllListeners('onNotification')
 })
 </script>
 
@@ -63,4 +73,5 @@ onUnmounted(() => {
     <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" />
     <RouterView />
   </div>
+  <Toast />
 </template>

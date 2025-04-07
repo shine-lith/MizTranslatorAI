@@ -4,12 +4,9 @@ import TextList from './components/TextList.vue'
 import TranslationAssistant from './components/TranslationAssistant.vue'
 import { store, settings, miz_dictkey} from './store.js'
 import Button from 'primevue/button'
-import Toast from 'primevue/toast'
-import { useToast } from 'primevue/usetoast'
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
 
-const toast = useToast()
 const textlistRef = ref()
 const chatRef = ref()
 const projectPath = ref() // 项目路径
@@ -141,19 +138,12 @@ function onTranslateChunk(e, data) {
   }
 }
 
-// 显示通知
-function onNotification(e, message, data){
-  toast.add({ severity: 'secondary', summary: message.msg, detail: message.desc, life: 3000 })
-}
-
 onMounted(() => {
   window.electron.ipcRenderer.on('onTranslateChunk', onTranslateChunk)
-  window.electron.ipcRenderer.on('onNotification', onNotification)
 })
 
 onUnmounted(() => {
   window.electron.ipcRenderer.removeAllListeners('onTranslateChunk')
-  window.electron.ipcRenderer.removeAllListeners('onNotification')
 })
 </script>
 
@@ -180,5 +170,4 @@ onUnmounted(() => {
       </SplitterPanel>
     </Splitter>
   </div>
-  <Toast />
 </template>
