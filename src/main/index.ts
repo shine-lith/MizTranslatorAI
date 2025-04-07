@@ -7,50 +7,17 @@ import fs from 'fs'
 import yauzl from 'yauzl'
 import { TranslateOllama } from './translate-ollama'
 
-const low = require('lowdb')
-const FileSync = require('lowdb/adapters/FileSync')
 const luaparse = require('luaparse')
-var md5 = require('md5')
-
+const md5 = require('md5')
 const APP_NAME = 'mizTranslatorAI'
-
-// 设置选项的key
-const SETID_WINDOWS_BOUNDS = 'WINBOUNDS'
-const SETID_TRANSOURCE = 'TRANSOURCE'
-const FILE_DB = 'db'
-
-// 字符串资源类型映射/设置表
-const TYPE_MAPSETTING = {
-  sortie: { text: '1.任务名称', keep: true },
-  descriptionText: { text: '2.形势', keep: true },
-  descriptionRedTask: { text: '3.红方任务', keep: true },
-  descriptionBlueTask: { text: '4.蓝方任务', keep: true },
-  descriptionNeutralsTask: { text: '5.中立任务', keep: true },
-  WptName: { text: '路点名', keep: false },
-  UnitName: { text: '单位名', keep: false },
-  GroupName: { text: '群组名', keep: false },
-  ActionComment: { keep: false },
-  ActionRadioText: { text: '菜单项', keep: true },
-  ActionText: { text: '提示信息', keep: true },
-  subtitle: { text: '字幕', keep: true }
-}
 
 var win
 var mizFile = ''
 var projectPath = ''
 var projectFileNameBase = null
 var tranNeedSave = false // tran文件保存状态
-// 设置lowdb 使用JSON序列化进行存储,默认存储的JSON格式是人类友好的格式，空间占用大
-var dbAdapter = new FileSync(FILE_DB, {
-  serialize: (data) => JSON.stringify(data),
-  deserialize: (data) => JSON.parse(data)
-})
-var db = low(dbAdapter)
 
 function createWindow(): void {
-  // 设置Menu
-  initDb()
-
   win = new BrowserWindow({
     frame: false,
     width: 900,
@@ -66,8 +33,6 @@ function createWindow(): void {
   })
 
   win.setTitle(APP_NAME)
-  var bounds = getSettings(SETID_WINDOWS_BOUNDS, null)
-  if (bounds) win.setBounds(bounds)
 
   win.on('ready-to-show', () => {
     win.show()
@@ -107,9 +72,6 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
   createWindow()
 
   app.on('activate', function () {
@@ -127,20 +89,6 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-// ipcMain.handle('translate:single', async (e, data)=> {
-
-//   const translator = new TranslateOllama({
-//     host: 'http://192.168.1.12:11434',
-//     model: 'deepseek-r1:32b',
-//     maxRetries: 3
-//   })
-
-//   const result = await translator.translate(data.originText)
-//   return result.result
-// })
 
 // 访问ollama api 获取已有模型列表
 ipcMain.handle('ollama:list', async (e, data) => {
@@ -227,12 +175,10 @@ ipcMain.on('titlebar:openFile', async () => {
 })
 
 ipcMain.on('closed', () => {
-  saveSettingsMenuItem()
   win = null
 })
 
 ipcMain.on('close', (e) => {
-  saveWindowSettings()
   if (tranNeedSave) {
     e.preventDefault()
 
@@ -260,37 +206,6 @@ ipcMain.on('close', (e) => {
 })
 
 ///////////////////////////////////////////////////////////////////////
-
-// 初始化系统设置存储
-function initDb() {
-  db.defaults({ settings: {}, cache: [] }).write()
-}
-
-// 从settings中加载
-// setid settings的key
-// defaultValue 当不存在该值时的默认值
-function getSettings(setid, defaultValue) {
-  return db.get('settings').get(setid, defaultValue).value()
-}
-
-function saveSettings(setid, value) {
-  db.get('settings').set(setid, value).write()
-}
-
-// 保存APP设置
-function saveSettingsMenuItem() {
-  // var saveMenuItemChecked = (setid) => {
-  //   // 保存菜单项的状态到settings
-  //   db.get("settings")
-  //     // settings 项的格式 setid:value
-  //     .set(setid, menuRoot.getMenuItemById(setid).checked)
-  //     .write();
-  // };
-}
-
-function saveWindowSettings() {
-  saveSettings(SETID_WINDOWS_BOUNDS, win.getBounds())
-}
 
 // 打开...
 async function openFile() {
@@ -359,15 +274,15 @@ function processDictionary(zipfile, entry, file, cleanup) {
       return
     }
     // 分块载入内容
-    const chunks = []
+    const chunks: Buffer[] = []
     readStream.on('data', (chunk) => chunks.push(chunk))
     readStream.on('end', () => {
       try {
         const fullContent = Buffer.concat(chunks).toString('utf8')
         const listData = processContent(fullContent)
         sendSuccess(file, listData)
-      } catch (e) {
-        handleError('文件解析失败', '内容格式不符合要求', `Parse error: ${e.message}`)
+      } catch (exception) {
+        handleError('文件解析失败', '内容格式不符合要求', `Parse error: ${exception.message}`)
       } finally {
         cleanup()
       }
@@ -459,6 +374,7 @@ function loadLua(fileContent) {
   luaparse.parse(fileContent)
   return listData
 }
+
 // 保存翻译工程
 function saveTranFile(json_data) {
   //var fileContent = JSON.stringify(data)
@@ -511,20 +427,6 @@ function setAppTitle(title) {
   }
 }
 
-//////////////////////////////菜单响应///////////////////////////////////
-// 清理翻译缓存
-function cleanTranslateCache() {
-  var bytetostring = (bytes) => {
-    if (bytes < 1024) return bytes + 'B'
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(3) + 'KB'
-    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(3) + 'MB'
-    else return (bytes / 1073741824).toFixed(3) + 'GB'
-  }
-  var dbStat = fs.statSync(FILE_DB)
-  db.get('cache').remove().write()
-  notification('翻译缓存已清除', '释放 ' + bytetostring(dbStat.size) + ' 空间', null)
-}
-
 //////////////////////////////UI消息响应///////////////////////////////////
 ipcMain.on('window:minimize', () => win.minimize())
 
@@ -538,10 +440,6 @@ ipcMain.on('window:maximize', function () {
 })
 
 ipcMain.on('window:close', () => win.close())
-
-ipcMain.on('getSettings', (e, setid) => {
-  var value = getSettings(setid, null)
-})
 
 // 复制文字到剪贴板
 ipcMain.on('textToClipboard', (e, text) => {
@@ -661,11 +559,6 @@ ipcMain.on('onTranslateTextChange', (e) => {
   tranNeedSave = true
 })
 
-// 清除翻译缓存
-ipcMain.on('cleanTranslateCache', (e) => {
-  cleanTranslateCache()
-})
-
 // 打开文件管理器
 ipcMain.on('openFolder', (e, data) => {
   shell.showItemInFolder(data)
@@ -674,16 +567,4 @@ ipcMain.on('openFolder', (e, data) => {
 // 使用外部浏览器打开网页
 ipcMain.on('openURL', (e, data) => {
   shell.openExternal(data)
-})
-
-// 保存到db Setting
-ipcMain.on('saveSetting', (e, data) => {
-  var settings = getSettings(data.key, null)
-  var value
-  if (settings) {
-    value = Object.assign(settings, data.value)
-  } else {
-    value = data.value
-  }
-  saveSettings(data.key, value)
 })
