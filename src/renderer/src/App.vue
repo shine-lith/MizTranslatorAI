@@ -53,9 +53,27 @@ function onSaveFile() {
   }
 }
 
+// 响应点击通知
+function clickNotifaction(action) {
+  const method = action.method
+  switch (method) {
+    case 'openFolder':
+      window.api.openFolder(action.args)
+      break
+    default:
+  }
+  toast.removeAllGroups();
+}
+
 // 显示通知
-function onNotification(e, message, data){
-  toast.add({ severity: 'secondary', summary: message.msg, detail: message.desc, life: 9000 })
+function onNotification(e, data){
+  toast.add({ 
+    severity: 'secondary',
+    summary: data.msg,
+    detail: data.desc,
+    action: data.action,
+    life: 4000
+  })
 }
 
 onMounted(() => {
@@ -76,10 +94,10 @@ onUnmounted(() => {
   </div>
   <Toast>
     <template #message="slotProps">
-      <div class="flex flex-col">
-        <div class="font-medium">{{ slotProps.message.summary }}</div>
-        <div class="text-sm mb-2" @click="onReply()">{{ slotProps.message.detail }}</div>
+      <div class="flex flex-col flex-auto" @click="clickNotifaction(slotProps.message.action)">
+        <div class="">{{ slotProps.message.summary }}</div>
+        <div class="text-sm text-gray-500" >{{ slotProps.message.detail }}</div>
       </div>
-  </template>
+    </template>
   </Toast>
 </template>

@@ -165,7 +165,6 @@ ipcMain.on('llm:generate', async (e, data) => {
 })
 
 ipcMain.on('dev:devFunction', () => {
-  console.log('devFunction')
   notification('通知', '这是一个通知', null)
   // loadMizFile('/Users/lith/Dev/MizTranslatorAI/Cesar_Syria_[Helicoper_Combat_Rescue].miz')
 })
@@ -349,7 +348,6 @@ function setProjectWorkPath(mizFile) {
 // 读取lua文件
 // fileContent lua 代码
 function loadLua(fileContent) {
-  console.log(fileContent)
   var events = new (require('events').EventEmitter)()
 
   Object.keys(luaparse.ast).forEach(function (type) {
@@ -405,11 +403,11 @@ function loadTranFile() {
 }
 
 // 在UI中显示通知
-function notification(msg, desc, onClick) {
+function notification(msg, desc, action) {
   win.webContents.send('onNotification', {
     msg: msg,
     desc: desc,
-    onClick: onClick
+    action: action
   })
 }
 
@@ -461,12 +459,11 @@ ipcMain.on('onCloseAndSaveProject', (e, data) => {
 
 // 保存工程
 ipcMain.on('titlebar:saveFile', (e, data) => {
-  var tranFilePath = saveTranFile(data)
-  notification('工程已保存', "<span class='action'>点击此处打开保存位置</span>", {
+  saveTranFile(data)
+  notification('工程已保存', "点击打开保存位置", {
     method: 'openFolder',
-    args: tranFilePath
+    args: projectPath
   })
-  tranNeedSave = false
 })
 
 // 导出miz文件
@@ -559,12 +556,12 @@ ipcMain.on('onTranslateTextChange', (e) => {
   tranNeedSave = true
 })
 
-// 打开文件管理器
-ipcMain.on('openFolder', (e, data) => {
-  shell.showItemInFolder(data)
-})
-
 // 使用外部浏览器打开网页
 ipcMain.on('openURL', (e, data) => {
   shell.openExternal(data)
+})
+
+// 打开
+ipcMain.on('openFolder', (e, data) => {
+  shell.showItemInFolder(data)
 })
