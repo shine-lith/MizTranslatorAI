@@ -53,6 +53,19 @@ function onSaveFile() {
   }
 }
 
+// 打包miz
+function onExportToMiz() {
+  if (isMizLoaded()) {
+    const data = {
+      listdata: store.listdata,  
+      overwrite: true,
+      backup: true,
+      translate_compare: true,
+    }
+    window.api.onExportToMiz(JSON.stringify(data))
+  }
+}
+
 // 响应点击通知
 function clickNotifaction(action) {
   const method = action.method
@@ -89,7 +102,7 @@ onUnmounted(() => {
 
 <template>
   <div class="h-screen flex flex-col z-999">
-    <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" />
+    <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" @onExportToMiz="onExportToMiz" />
     <RouterView />
   </div>
   <Toast>

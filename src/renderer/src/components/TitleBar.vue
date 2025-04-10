@@ -14,7 +14,11 @@ defineExpose({
   setTitle
 })
 
-const emit = defineEmits(['onOpenFile', 'onSaveFile'])
+const emit = defineEmits([
+  'onOpenFile',
+  'onSaveFile',
+  'onExportToMiz'
+])
 
 const titleText = ref('mizTranslator')
 
@@ -45,7 +49,7 @@ function onSaveFile() {
 
 // 打包
 function onExportToMiz() {
-  window.api.onExportToMiz()
+  emit('onExportToMiz')
 }
 
 // 最小化

@@ -7,6 +7,7 @@ import fs from 'fs'
 import yauzl from 'yauzl'
 import { TranslateOllama } from './translate-ollama'
 
+const Zip = require("adm-zip");
 const luaparse = require('luaparse')
 const md5 = require('md5')
 const APP_NAME = 'mizTranslatorAI'
@@ -46,7 +47,7 @@ function createWindow(): void {
   // 监听页面加载完成事件
   win.webContents.on('did-finish-load', () => {
     // for dev auto run something
-    loadMizFile('./demo.miz')
+    loadMizFile('/Users/lith/Dev/MizTranslatorAI/demo.miz')
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -339,10 +340,11 @@ function clearProjectWorkPath() {
 }
 
 // 设置工作区路径
-function setProjectWorkPath(mizFile) {
-  projectPath = path.dirname(mizFile)
-  projectFileNameBase = mizFile.substring(0, mizFile.length - path.extname(mizFile).length)
-  setAppTitle(mizFile)
+function setProjectWorkPath(file) {
+  mizFile = file
+  projectPath = path.dirname(file)
+  projectFileNameBase = file.substring(0, file.length - path.extname(file).length)
+  setAppTitle(file)
 }
 
 // 读取lua文件
@@ -467,9 +469,10 @@ ipcMain.on('titlebar:saveFile', (e, data) => {
 })
 
 // 导出miz文件
-ipcMain.on('exportToMiz', (e, d) => {
-  const DCS_DICT_STR_BR = '\\\n'
+ipcMain.on('titlebar:exportToMiz', (e, data) => {
+  data = JSON.parse(data)
 
+  const DCS_DICT_STR_BR = '\\\n'
   // 将文本转换为DCS Dict的格式
   var toDcsDictStr = function (str) {
     var str = str.replace(new RegExp('\n', 'gm'), DCS_DICT_STR_BR) // 过滤换行 把换行转为 \
@@ -478,77 +481,67 @@ ipcMain.on('exportToMiz', (e, d) => {
   }
 
   // 生成DCS miz里Dictionary文件内容
-  // var buildDcsDictionaryContent = function(data) {
-  //   var dictionaryContent = ''
-  //   dictionaryContent += 'dictionary = \n{\n'
-  //   data.forEach((item) => {
-  //     if (item.translateText) {
-  //       var key = item.key
-  //       var translateText = toDcsDictStr(item.translateText)
-  //       // if (store.translate_compare) {
-  //         // 对照模式 把原文加到译文里
-  //         translateText =
-  //           toDcsDictStr(item.originText) + DCS_DICT_STR_BR + DCS_DICT_STR_BR + DCS_DICT_STR_BR + translateText
-  //       // }
-  //       dictionaryContent += `    ['${key}'] = '${translateText}',\n`
-  //     }
-  //   })
-  //   dictionaryContent += '} -- end of dictionary\n'
-  //   return dictionaryContent
-  // }
+  var buildDcsDictionaryContent = function() {
+    var dictionaryContent = ''
+    dictionaryContent += 'dictionary = \n{\n'
+    data.listdata.forEach((item) => {
+      if (item.translateText) {
+        var key = item.key
+        var translateText = toDcsDictStr(item.translateText)
+        if (data.translate_compare) {
+          // 对照模式 把原文加到译文里
+          translateText =
+            toDcsDictStr(item.originText) + DCS_DICT_STR_BR + DCS_DICT_STR_BR + DCS_DICT_STR_BR + translateText
+        }
+        dictionaryContent += `    ['${key}'] = '${translateText}',\n`
+      }
+    })
+    dictionaryContent += '} -- end of dictionary\n'
+    return dictionaryContent
+  }
 
-  // var exportMiz = async function(mizFile, exportMizFile, dataTable) {
-  // var dictionaryContent = buildDcsDictionaryContent(dataTable)
-  // 往副本中添加翻译文件
-  //   fs.readFile(mizFile, (err, data) => {
-  //     var zip = new JSzip()
-  //     zip.loadAsync(data).then(
-  //       (zip) => {
-  //         zip.file('l10n/CN/dictionary', dictionaryContent)
-  //         zip
-  //           .generateNodeStream({ type: 'nodebuffer', streamFiles: true })
-  //           .pipe(fs.createWriteStream(exportMizFile))
-  //           .on('finish', () => {
-  //             debugInfo('Export miz file : ' + exportMizFile)
-  //             notification('打包完成', '<span class=\'action\'>点击此处打开保存位置</span>', {
-  //               method: 'openFolder',
-  //               args: exportMizFile,
-  //             })
-  //           })
-  //       },
-  //       (error) => {
-  //         debugInfo('Export miz fail')
-  //       }
-  //     )
-  //   })
-  // }
+  var exportMiz = async function(mizFile, exportMizFile) {
+    var dictionaryContent = buildDcsDictionaryContent()
+    // 往副本中添加翻译文件
+    var zip = new Zip(mizFile); 
+    zip.deleteFile('l10n/CN/dictionary') // 删除原文件
+    zip.addFile('l10n/CN/dictionary', Buffer.from(dictionaryContent))
+    zip.writeZip(exportMizFile, function (err) {
+      if (err) {
+        debugInfo('Export miz fail')
+      } else {
+        debugInfo('Export miz file : ' + exportMizFile)
+        notification('打包完成', '点击此处打开保存位置', {
+          method: 'openFolder',
+          args: exportMizFile,
+        })
+      }
+    })
+  }
 
-  // var data = d.data
-  // var store = d.store
+  if (fs.existsSync(mizFile)) {
+    if (data.overwrite) {
+      if (data.backup) { //备份原文件
+        fs.copyFileSync(mizFile, projectFileNameBase + '_Backup.miz')
+      }
+      exportMiz(mizFile, mizFile) // 覆盖到原文件
+    } 
+    // else {
+    //   //让用户选择打包位置
+    //   const { canceled, filePath } = await dialog.showSaveDialog({
+    //     title: '保存到',
+    //     defaultPath: projectFileNameBase + '_CN.miz',
+    //     filters: [{ name: 'DCS World 任务', extensions: ['miz'] }],
+    //   })
 
-  // if (fs.existsSync(mizFile)) {
-  //   if (store.merge_to_miz) {
-  //     if (store.backup_orign_miz) { //备份原文件
-  //       fs.copyFileSync(mizFile, projectFileNameBase + '_Backup.miz')
-  //     }
-  //     exportMiz(mizFile, mizFile, data) // 覆盖到原文件
-  //   } else {
-  //     //让用户选择打包位置
-
-  //     const { canceled, filePath } = await dialog.showSaveDialog({
-  //       title: '保存到',
-  //       defaultPath: projectFileNameBase + '_CN.miz',
-  //       filters: [{ name: 'DCS World 任务', extensions: ['miz'] }],
-  //     })
-
-  //     if (!canceled) {
-  //       exportMiz(mizFile, filePath, data)
-  //     }
-  //   }
-  // } else {
-  //   notification('打包失败，原文件不存在!', '', null)
-  //   debugInfo('mizFile not exist')
-  // }
+    //   if (!canceled) {
+    //     exportMiz(mizFile, filePath, data)
+    //   }
+    // }
+  } else {
+    notification('打包失败，原文件不存在!', '', null)
+    debugInfo('mizFile not exist')
+  }
 })
 
 // 存在新的修改
