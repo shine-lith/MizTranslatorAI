@@ -9,6 +9,7 @@ import Textarea from 'primevue/textarea'
 import IftaLabel from 'primevue/IftaLabel'
 import Select from 'primevue/select'
 import Slider from 'primevue/slider'
+import Checkbox from 'primevue/checkbox'
 
 const router = useRouter()
 const ollamaModels = ref()
@@ -47,22 +48,50 @@ onMounted(() => {
     <div class="flex flex-1">
       <div class="p-2 w-60">
         <ol>
-          <li class="p-5 hover:bg-sky-700">LLM 翻译设置</li>
+          <li class="p-5 hover:bg-sky-700">设置</li>
+          <li class="p-5 hover:bg-sky-700">LLM翻译设置</li>
           <li class="p-5 hover:bg-sky-700">Ollama</li>
         </ol>
       </div>
       <div class="flex-1 flex flex-col gap-2 pr-10">
-        <h2 id="setting">提示词设置</h2>
-        <p class="text-sm text-gray-500">
-          该示词会在问答和翻译时自动添加到问题前面，以便让LLM模型更好地理解问题
-        </p>
+        <h1 class="py-5" id="setting">设置</h1>
+
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-2">
+            <Checkbox v-model="settings.overwrite" inputId="overwrite" binary/>
+            <label for="overwrite"> 打包覆盖原文件 </label>
+          </div>
+          <div class="text-sm text-gray-500"><p>将翻译结果直接保存到原miz文件</p></div>
+        </div>
+        
+        <div class="flex flex-col gap-2">
+          <div class="flex items-center gap-2">
+            <Checkbox v-model="settings.backup" inputId="backup" binary/>
+            <label for="backup"> 创建备份 </label>
+          </div>
+          <div class="text-sm text-gray-500"><p>打包前备份原miz文件</p></div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-2">
+            <Checkbox v-model="settings.translate_compare" inputId="translate_compare" binary/>
+            <label for="translate_compare"> 对照模式 </label>
+          </div>
+          <div class="text-sm text-gray-500"><p>同时显示两种语言</p></div>
+        </div>
+
+        <h2 class="py-5" id="prompt">翻译提示词</h2>
         <label for="chat_prompt">问答提示词</label>
+        <p class="text-sm text-gray-500">该提示词将有助于在问答过程中让LLM模型更好地理解问题</p>
         <Textarea id="chat_prompt" v-model="settings.chat_prompt" autoResize variant="filled" />
         <p class="text-sm text-gray-500">{miz_data} 用来代表任务简报信息，是问答题提示词的关键内容，请勿删除</p>
 
         <label for="translate_prompt">翻译提示词</label>
+        <p class="text-sm text-gray-500">该提示词将引导LLM模型翻译文本</p>
         <Textarea id="translate_prompt" v-model="settings.translate_prompt" autoResize variant="filled" />
-        <h2>Ollama</h2>
+        
+        
+        <h2 class="py-5" id="ollama">Ollama</h2>
         <label for="ollama_host">API地址</label>
         <InputText
           id="ollama_host"

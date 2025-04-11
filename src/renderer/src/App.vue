@@ -4,7 +4,7 @@ import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 import Button from 'primevue/button'
 import TitleBar from './components/TitleBar.vue'
-import { store, miz_dictkey } from './store.js'
+import { store, settings, miz_dictkey } from './store.js'
 
 const toast = useToast()
 const titleBarRef = ref()
@@ -58,9 +58,9 @@ function onExportToMiz() {
   if (isMizLoaded()) {
     const data = {
       listdata: store.listdata,  
-      overwrite: true,
-      backup: true,
-      translate_compare: true,
+      overwrite: settings.overwrite,
+      backup: settings.backup,
+      translate_compare: settings.translate_compare,
     }
     window.api.onExportToMiz(JSON.stringify(data))
   }
