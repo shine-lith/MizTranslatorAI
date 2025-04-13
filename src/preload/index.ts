@@ -13,7 +13,7 @@ const api = {
   llmGenerate: (data) => ipcRenderer.send('llm:generate', data),
   llmChat: (data) => ipcRenderer.send('llm:chat', data),
   onOllamaList: (data) => ipcRenderer.invoke('ollama:list', data),
-  openFolder:(data) => ipcRenderer.send('openFolder', data)
+  openFolder: (data) => ipcRenderer.send('openFolder', data)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

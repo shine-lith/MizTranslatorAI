@@ -7,7 +7,7 @@ import fs from 'fs'
 import yauzl from 'yauzl'
 import { TranslateOllama } from './translate-ollama'
 
-const Zip = require("adm-zip");
+const Zip = require('adm-zip')
 const luaparse = require('luaparse')
 const md5 = require('md5')
 const APP_NAME = 'mizTranslatorAI'
@@ -299,7 +299,7 @@ function processDictionary(zipfile, entry, file, cleanup) {
 function processContent(content) {
   var listData = loadLua(content)
   // 过滤掉原文为空的行
-  listData = listData.filter(line => line.originText !== '')
+  listData = listData.filter((line) => line.originText !== '')
   listData.forEach((line) => {
     line.translateText = ''
     line.translateStamp = md5(line.originText) // 添加翻译标识
@@ -462,7 +462,7 @@ ipcMain.on('onCloseAndSaveProject', (e, data) => {
 // 保存工程
 ipcMain.on('titlebar:saveFile', (e, data) => {
   saveTranFile(data)
-  notification('工程已保存', "点击打开保存位置", {
+  notification('工程已保存', '点击打开保存位置', {
     method: 'openFolder',
     args: projectPath
   })
@@ -481,7 +481,7 @@ ipcMain.on('titlebar:exportToMiz', (e, data) => {
   }
 
   // 生成DCS miz里Dictionary文件内容
-  var buildDcsDictionaryContent = function() {
+  var buildDcsDictionaryContent = function () {
     var dictionaryContent = ''
     dictionaryContent += 'dictionary = \n{\n'
     data.listdata.forEach((item) => {
@@ -491,7 +491,11 @@ ipcMain.on('titlebar:exportToMiz', (e, data) => {
         if (data.translate_compare) {
           // 对照模式 把原文加到译文里
           translateText =
-            toDcsDictStr(item.originText) + DCS_DICT_STR_BR + DCS_DICT_STR_BR + DCS_DICT_STR_BR + translateText
+            toDcsDictStr(item.originText) +
+            DCS_DICT_STR_BR +
+            DCS_DICT_STR_BR +
+            DCS_DICT_STR_BR +
+            translateText
         }
         dictionaryContent += `    ['${key}'] = '${translateText}',\n`
       }
@@ -500,10 +504,10 @@ ipcMain.on('titlebar:exportToMiz', (e, data) => {
     return dictionaryContent
   }
 
-  var exportMiz = async function(mizFile, exportMizFile) {
+  var exportMiz = async function (mizFile, exportMizFile) {
     var dictionaryContent = buildDcsDictionaryContent()
     // 往副本中添加翻译文件
-    var zip = new Zip(mizFile); 
+    var zip = new Zip(mizFile)
     zip.deleteFile('l10n/CN/dictionary') // 删除原文件
     zip.addFile('l10n/CN/dictionary', Buffer.from(dictionaryContent))
     zip.writeZip(exportMizFile, function (err) {
@@ -513,7 +517,7 @@ ipcMain.on('titlebar:exportToMiz', (e, data) => {
         debugInfo('Export miz file : ' + exportMizFile)
         notification('打包完成', '点击此处打开保存位置', {
           method: 'openFolder',
-          args: exportMizFile,
+          args: exportMizFile
         })
       }
     })
@@ -521,11 +525,12 @@ ipcMain.on('titlebar:exportToMiz', (e, data) => {
 
   if (fs.existsSync(mizFile)) {
     if (data.overwrite) {
-      if (data.backup) { //备份原文件
+      if (data.backup) {
+        //备份原文件
         fs.copyFileSync(mizFile, projectFileNameBase + '_Backup.miz')
       }
       exportMiz(mizFile, mizFile) // 覆盖到原文件
-    } 
+    }
     // else {
     //   //让用户选择打包位置
     //   const { canceled, filePath } = await dialog.showSaveDialog({

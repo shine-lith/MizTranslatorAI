@@ -31,7 +31,6 @@ const dialog_editSystemPrompt_show = ref(false)
 const dialog_editSystemPrompt_chat = ref(null)
 const dialog_editSystemPrompt_translate = ref(null)
 
-
 // 发送用户输入的问题到LLM询问队列
 function onChatSend() {
   if (chatLoading.value) {
@@ -130,7 +129,7 @@ function dialogEditSystemPromptSave() {
 }
 
 // 监听翻译的流
-function onTranslateChunk (e, data) {
+function onTranslateChunk(e, data) {
   var assi = componentList.value.find(
     (comp) => comp.props.type == 'assistant' && comp.props.question_id == data.question_id
   )

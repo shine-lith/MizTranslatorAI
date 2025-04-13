@@ -81,7 +81,12 @@ onUnmounted(() => {
     sortField="showName"
     :sortOrder="1"
   >
-    <Column field="showName" header="类型" sortable class="w-[80px] content-stretch truncate"></Column>
+    <Column
+      field="showName"
+      header="类型"
+      sortable
+      class="w-[80px] content-stretch truncate"
+    ></Column>
     <Column field="no" header="标识" sortable class="w-[40px] content-stretch truncate"></Column>
     <Column field="originText" header="原文" class="min-w-20 max-w-20 content-stretch"></Column>
     <Column field="translateText" header="译文" class="min-w-20 max-w-20 content-stretch"></Column>
@@ -89,7 +94,7 @@ onUnmounted(() => {
       <template #body="{ data, index }">
         <!-- :icon 可以支持表达式 -->
         <Button
-          v-show="data.originText!==''"
+          v-show="data.originText !== ''"
           :icon="!loadingStates[data.key] ? 'pi pi-angle-right' : 'pi pi-spinner pi-spin'"
           :disabled="loadingStates[data.key]"
           size="small"

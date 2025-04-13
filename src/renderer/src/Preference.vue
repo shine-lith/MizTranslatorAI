@@ -40,10 +40,10 @@ onMounted(() => {
 })
 </script>
 <template>
-  <div id="preference" class=" pt-14 h-full ">
+  <div id="preference" class="pt-14 h-full">
     <div class="h-12 bg-gray-800 fixed w-full flex items-center">
       <div class="flex items-center">
-        <Button @click="back" icon="pi pi-arrow-left" label="返回" variant="text" ></Button> 
+        <Button @click="back" icon="pi pi-arrow-left" label="返回" variant="text"></Button>
         <h1>偏好设置</h1>
       </div>
     </div>
@@ -57,7 +57,7 @@ onMounted(() => {
         </ol>
       </div>
 
-      <div class="flex-1 overflow-y-auto ">
+      <div class="flex-1 overflow-y-auto">
         <h1 class="py-5" id="setting">设置</h1>
 
         <div class="flex flex-col gap-2">
