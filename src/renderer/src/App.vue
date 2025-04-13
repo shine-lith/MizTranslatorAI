@@ -13,21 +13,20 @@ const titleBarRef = ref()
 function onMizOpen(e, code, data) {
   if (code == 200) {
     // 识别那些事任务简报信息
-    const dicts = ['descriptionText','descriptionRedTask','descriptionBlueTask'];
+    const dicts = ['descriptionText', 'descriptionRedTask', 'descriptionBlueTask']
     const mission_data = []
     // 过滤掉不需要的行，识别类型
     const datalist = data.data.filter((line) => {
-        const r = line.key.match(/DictKey_(.*)_\d+/)
-        const type = r ? r[1] : 'Text'
-        line.showName = miz_dictkey[type]?.text || type
-        // 提取简报信息
-        if (dicts.includes(type)) {
-          mission_data.push({type: type, text: line.originText})
-        }
-        return miz_dictkey[type] ? miz_dictkey[type].keep : true
+      const r = line.key.match(/DictKey_(.*)_\d+/)
+      const type = r ? r[1] : 'Text'
+      line.showName = miz_dictkey[type]?.text || type
+      // 提取简报信息
+      if (dicts.includes(type)) {
+        mission_data.push({ type: type, text: line.originText })
       }
-    )
-    // 过滤掉不需要的行，识别类型  
+      return miz_dictkey[type] ? miz_dictkey[type].keep : true
+    })
+    // 过滤掉不需要的行，识别类型
     store.mizFile = data.mizFile
     store.projectPath = data.projectPath
     store.listdata = datalist
@@ -57,10 +56,10 @@ function onSaveFile() {
 function onExportToMiz() {
   if (isMizLoaded()) {
     const data = {
-      listdata: store.listdata,  
+      listdata: store.listdata,
       overwrite: settings.overwrite,
       backup: settings.backup,
-      translate_compare: settings.translate_compare,
+      translate_compare: settings.translate_compare
     }
     window.api.onExportToMiz(JSON.stringify(data))
   }
@@ -75,12 +74,12 @@ function clickNotifaction(action) {
       break
     default:
   }
-  toast.removeAllGroups();
+  toast.removeAllGroups()
 }
 
 // 显示通知
-function onNotification(e, data){
-  toast.add({ 
+function onNotification(e, data) {
+  toast.add({
     severity: 'secondary',
     summary: data.msg,
     detail: data.desc,
@@ -101,15 +100,20 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col z-999">
-    <TitleBar ref="titleBarRef" @onOpenFile="onOpenFile" @onSaveFile="onSaveFile" @onExportToMiz="onExportToMiz" />
+  <div class="h-screen overflow-hidden">
+    <TitleBar
+      ref="titleBarRef"
+      @onOpenFile="onOpenFile"
+      @onSaveFile="onSaveFile"
+      @onExportToMiz="onExportToMiz"
+    />
     <RouterView />
   </div>
   <Toast>
     <template #message="slotProps">
       <div class="flex flex-col flex-auto" @click="clickNotifaction(slotProps.message.action)">
         <div class="">{{ slotProps.message.summary }}</div>
-        <div class="text-sm text-gray-500" >{{ slotProps.message.detail }}</div>
+        <div class="text-sm text-gray-500">{{ slotProps.message.detail }}</div>
       </div>
     </template>
   </Toast>

@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import TextList from './components/TextList.vue'
 import TranslationAssistant from './components/TranslationAssistant.vue'
-import { store, settings, miz_dictkey} from './store.js'
+import { store, settings, miz_dictkey } from './store.js'
 import Button from 'primevue/button'
 import Splitter from 'primevue/splitter'
 import SplitterPanel from 'primevue/splitterpanel'
@@ -54,10 +54,10 @@ function run() {
       chatRef.value.addUserLine(question_id, data.key, data.originText)
       chatRef.value.addAssistantLine(question_id, data.key)
 
-      if(data.method === 'chat') {
+      if (data.method === 'chat') {
         // 向llm提问
         window.api.llmChat({
-          api: "ollama",
+          api: 'ollama',
           host: settings.value.ollama_host,
           model: settings.value.ollama_model,
           temperature: settings.value.ollama_temperature,
@@ -101,14 +101,14 @@ function getHistoryMessages() {
   // chat使用的prompt，并将miz中的简报信息提供给llm
   var chatSystemPrompt = settings.value.chat_prompt
   var miz_data = ''
-  store.mission_data.forEach((item)=>{
-    if(item.type=='descriptionText'){
-      miz_data += "# 当前形势\r\n"
+  store.mission_data.forEach((item) => {
+    if (item.type == 'descriptionText') {
+      miz_data += '# 当前形势\r\n'
     }
-    if(item.type=='descriptionRedTask' || item.type=='descriptionBlueTask'){
-      miz_data += "# 任务说明\r\n"
+    if (item.type == 'descriptionRedTask' || item.type == 'descriptionBlueTask') {
+      miz_data += '# 任务说明\r\n'
     }
-    miz_data+=item.text
+    miz_data += item.text
   })
   chatSystemPrompt = chatSystemPrompt.replace(/{miz_data}/g, miz_data)
   messages.push(m('system', chatSystemPrompt))
@@ -116,7 +116,7 @@ function getHistoryMessages() {
   // 消息中添加上下文
   const history = chatRef.value.getMessageHistory()
   if (history.length > 0) {
-    history.slice(0,settings.value.ollama_context_limit).forEach((m) => {
+    history.slice(0, settings.value.ollama_context_limit).forEach((m) => {
       messages.push(m)
     })
   }
@@ -148,7 +148,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex-1 flex overflow-hidden">
+  <div class="pt-14 h-full flex overflow-hidden">
     <Splitter
       class="flex-1 flex overflow-hidden"
       gutterSize="1"
