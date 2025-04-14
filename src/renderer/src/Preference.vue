@@ -40,11 +40,11 @@ onMounted(() => {
 })
 </script>
 <template>
-  <div id="preference" class="pt-14 h-full">
+  <div id="preference" class="absolute w-full h-full pt-14 z-100">
     <div class="h-12 bg-gray-800 fixed w-full flex items-center">
-      <div class="flex items-center">
-        <Button @click="back" icon="pi pi-arrow-left" label="返回" variant="text"></Button>
-        <h1>偏好设置</h1>
+      <div class="flex items-center gap-4">
+        <Button @click="back" size="small" icon="pi pi-arrow-left" label="返回" variant="text"></Button>
+        <h1>设置</h1>
       </div>
     </div>
 
@@ -173,3 +173,10 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+#preference{
+  background-color: #000;
+}
+
+</style>

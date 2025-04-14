@@ -70,7 +70,7 @@ function showPreference() {
 </script>
 
 <template>
-  <div id="titlebar" class="h-14 w-full fixed flex">
+  <div id="titlebar" class="h-14 w-full fixed flex z-999">
     <div id="menu" class="flex flex-none">
       <img class="m-4" src="../assets/app.svg" />
       <Button @click="onOpenFile" size="small" label="打开" icon="pi pi-file" variant="text" />
@@ -93,14 +93,14 @@ function showPreference() {
 </template>
 
 <style scoped>
+#titlebar{
+  background-color: #1e1e1e;
+}
 #apptitle {
   -webkit-app-region: drag;
   cursor: default;
   user-select: none;
   font-size: 0.9rem;
-}
-#menu {
-  z-index: 999;
 }
 #win_close:hover {
   background-color: red;

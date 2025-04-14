@@ -107,7 +107,11 @@ onUnmounted(() => {
       @onSaveFile="onSaveFile"
       @onExportToMiz="onExportToMiz"
     />
-    <RouterView />
+    <router-view v-slot="{ Component, route}">
+      <Transition :name="route.meta.transition || 'slide'">
+        <component :is="Component" />
+      </Transition>
+    </router-view>
   </div>
   <Toast>
     <template #message="slotProps">
@@ -118,3 +122,22 @@ onUnmounted(() => {
     </template>
   </Toast>
 </template>
+
+<style scoped>
+/* 动画 */
+.slide-in-enter-active,
+.slide-in-leave-active{
+  transition: all 1000ms;
+}
+.slide-in-enter-from {
+  transform: translateY(-100%);
+}
+
+.slide-out-enter-active,
+.slide-out-leave-active{
+  transition: all 1000ms;
+}
+.slide-out-leave-to {
+  transform: translateY(-100%);
+}
+</style>

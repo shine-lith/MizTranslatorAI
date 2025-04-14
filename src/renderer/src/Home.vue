@@ -148,7 +148,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="pt-14 h-full flex overflow-hidden">
+  <div class="absolute w-full h-full pt-14 flex overflow-hidden">
     <Splitter
       class="flex-1 flex overflow-hidden"
       gutterSize="1"
