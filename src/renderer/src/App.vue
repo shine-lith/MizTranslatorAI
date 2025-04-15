@@ -127,7 +127,7 @@ onUnmounted(() => {
 /* 动画 */
 .slide-in-enter-active,
 .slide-in-leave-active{
-  transition: all 1000ms;
+  transition: all 300ms;
 }
 .slide-in-enter-from {
   transform: translateY(-100%);
@@ -135,7 +135,7 @@ onUnmounted(() => {
 
 .slide-out-enter-active,
 .slide-out-leave-active{
-  transition: all 1000ms;
+  transition: all 300ms;
 }
 .slide-out-leave-to {
   transform: translateY(-100%);
