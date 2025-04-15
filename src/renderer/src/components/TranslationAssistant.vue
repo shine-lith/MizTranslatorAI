@@ -182,7 +182,7 @@ onUnmounted(() => {
         <p class="text-sm flex gap-2">
           <span v-show="settings.ollama_host !== ''">
             <span>Ollama</span>
-            <span v-show="settings.ollama_model !== ''"> - {{ settings.ollama_model }}</span>
+            <span v-show="settings.ollama_model !== null"> - {{ settings.ollama_model }}</span>
           </span>
         </p>
       </div>
