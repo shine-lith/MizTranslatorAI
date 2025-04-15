@@ -26,9 +26,11 @@ const MyPreset = definePreset(Aura, {
 })
 
 router.afterEach((to, from) => {
-  const toDepth = to.path.split('/').filter(item => item !== '').length
-  const fromDepth = from.path.split('/').filter(item => item !== '').length
-  to.meta.transition = toDepth < fromDepth ? 'slide-out' : 'slide-in'
+  if(to.path !== from.path){
+    const toDepth = to.path.split('/').filter(item => item !== '').length
+    const fromDepth = from.path.split('/').filter(item => item !== '').length
+    to.meta.transition = toDepth < fromDepth ? 'slide-out' : 'slide-in'
+  }
 })
 
 const app = createApp(App)
