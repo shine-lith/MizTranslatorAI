@@ -187,50 +187,24 @@ onUnmounted(() => {
         </p>
       </div>
       <Button
-        class="p-1"
-        @click="dialogEditSystemPromptShow"
-        label=""
-        icon="pi pi-wrench"
-        variant="text"
-      ></Button>
-      <Button class="p-1" @click="" label="" icon="pi pi-delete-left" variant="text"></Button>
-      <Button
         v-show="!isQueueRunning"
-        class="p-1"
         @click="onTranslateAll"
         label="翻译所有"
-        icon="pi pi-bolt"
         variant="text"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          class="size-5"
-        >
-          <path
-            d="M6.3 2.84A1.5 1.5 0 0 0 4 4.11v11.78a1.5 1.5 0 0 0 2.3 1.27l9.344-5.891a1.5 1.5 0 0 0 0-2.538L6.3 2.841Z"
-          />
-        </svg>
-      </Button>
+        icon="pi pi-play"
+        size="small"
+      />
       <Button
         v-show="isQueueRunning"
-        class="p-1"
         @click="onTranslateStop"
         label="停止"
         variant="text"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          class="size-5"
-        >
-          <path
-            d="M5.25 3A2.25 2.25 0 0 0 3 5.25v9.5A2.25 2.25 0 0 0 5.25 17h9.5A2.25 2.25 0 0 0 17 14.75v-9.5A2.25 2.25 0 0 0 14.75 3h-9.5Z"
-          />
-        </svg>
-      </Button>
+        size="small"
+        icon="pi pi-stop"
+      />
+
+      <Button @click="dialogEditSystemPromptShow" label="提示词设置" icon="pi pi-wrench"  variant="text" size="small" />
+      <Button @click="" label="清空" icon="pi pi-delete-left" variant="text" size="small" />
     </div>
   </div>
   <div ref="componentContainer" class="h-full overflow-y-auto pl-0 pr-3 gap-2">
