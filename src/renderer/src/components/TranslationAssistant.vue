@@ -246,7 +246,7 @@ onUnmounted(() => {
     <InputText
       v-model="chatInput"
       class="border-none flex-1"
-      placeholder="向LLM发送提问"
+      placeholder="针对任务简报信息进行提问"
       aria-multiline
     />
     <Button
@@ -273,7 +273,9 @@ onUnmounted(() => {
       </div>
     </template>
     <div>
+      <label for="chat_prompt">问答提示词</label>
       <Textarea
+        id="chat_prompt"
         class="w-[100%]"
         v-model="dialog_editSystemPrompt_chat"
         autoResize
@@ -281,7 +283,9 @@ onUnmounted(() => {
       />
     </div>
     <div>
+      <label for="translate_prompt">翻译提示词</label>
       <Textarea
+        id="translate_prompt"
         class="w-[100%]"
         v-model="dialog_editSystemPrompt_translate"
         autoResize
