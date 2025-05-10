@@ -47,7 +47,7 @@ function createWindow(): void {
   // 监听页面加载完成事件
   win.webContents.on('did-finish-load', () => {
     // for dev auto run something
-    loadMizFile('/Users/lith/Dev/MizTranslatorAI/demo.miz')
+    // loadMizFile('/Users/lith/Dev/MizTranslatorAI/demo.miz')
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -110,7 +110,7 @@ ipcMain.handle('ollama:list', async (e, data) => {
 ipcMain.on('llm:chat', async (e, data) => {
   const ollama = new TranslateOllama({
     host: data.host,
-    maxRetries: 3
+    maxRetries: 1
   })
 
   data.context.push({ role: 'user', content: data.originText })
@@ -123,6 +123,7 @@ ipcMain.on('llm:chat', async (e, data) => {
       temperature: data.temperature
     }
   }
+  try {
   const stream = ollama.chat(request)
   for await (const chunk of stream) {
     var result = {
@@ -133,6 +134,10 @@ ipcMain.on('llm:chat', async (e, data) => {
       }
     }
     win.webContents.send('onTranslateChunk', result)
+    }
+  } catch (error) {
+    win.webContents.send('onTranslateChunk', {...data, ...{ done: true, chunk: '错误！无法连接到Ollama' } })
+    notification('请求失败', '请检查Ollama的配置和运行情况', null)
   }
 })
 
@@ -140,7 +145,7 @@ ipcMain.on('llm:chat', async (e, data) => {
 ipcMain.on('llm:generate', async (e, data) => {
   const ollama = new TranslateOllama({
     host: data.host,
-    maxRetries: 3
+    maxRetries: 1
   })
   const request = {
     model: data.model,
@@ -152,6 +157,7 @@ ipcMain.on('llm:generate', async (e, data) => {
       temperature: data.temperature
     }
   }
+  try{
   const stream = ollama.generate(request)
   for await (const chunk of stream) {
     var result = {
@@ -162,6 +168,10 @@ ipcMain.on('llm:generate', async (e, data) => {
       }
     }
     win.webContents.send('onTranslateChunk', result)
+    }
+  } catch (error) {
+    win.webContents.send('onTranslateChunk', {...data, ...{ done: true, chunk: '错误！无法连接到Ollama' } })
+    notification('请求失败', '请检查Ollama的配置和运行情况', null)
   }
 })
 
