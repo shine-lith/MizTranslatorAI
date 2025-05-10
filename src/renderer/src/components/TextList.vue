@@ -50,6 +50,13 @@ function setLineLoading(data, state) {
   loadingStates.value[data.key] = state
 }
 
+// 设置所有行loading 状态为false
+function setLineLoadingAllDone() {
+  store.listdata.forEach((data) => {
+    loadingStates.value[data.key] = false
+  })
+}
+
 // 过滤思考标签中的内容
 function removeThinkTags(str) {
   // 匹配 <think> 标签及其内容（包括多行情况）
