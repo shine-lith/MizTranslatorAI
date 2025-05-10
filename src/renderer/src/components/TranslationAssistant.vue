@@ -95,6 +95,11 @@ async function addAssistantLine(question_id, dictkey) {
   scrollToBottom(true)
 }
 
+function clearHistory() {
+  componentList.value = []
+  messageList.length = 0
+}
+
 function removeComponent(id) {
   componentList.value = componentList.value.filter((comp) => comp.id !== id)
 }
@@ -202,9 +207,8 @@ onUnmounted(() => {
         size="small"
         icon="pi pi-stop"
       />
-
       <Button @click="dialogEditSystemPromptShow" label="提示词设置" icon="pi pi-wrench"  variant="text" size="small" />
-      <Button @click="" label="清空" icon="pi pi-delete-left" variant="text" size="small" />
+      <Button @click="clearHistory" label="清空" icon="pi pi-delete-left" variant="text" size="small" />
     </div>
   </div>
   <div ref="componentContainer" class="h-full overflow-y-auto pl-0 pr-3 gap-2">
