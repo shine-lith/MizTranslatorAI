@@ -540,23 +540,26 @@ ipcMain.on('titlebar:exportToMiz', (e, data) => {
       }
       exportMiz(mizFile, mizFile) // 覆盖到原文件
     }
-    // else {
-    //   //让用户选择打包位置
-    //   const { canceled, filePath } = await dialog.showSaveDialog({
-    //     title: '保存到',
-    //     defaultPath: projectFileNameBase + '_CN.miz',
-    //     filters: [{ name: 'DCS World 任务', extensions: ['miz'] }],
-    //   })
-
-    //   if (!canceled) {
-    //     exportMiz(mizFile, filePath, data)
-    //   }
-    // }
+    else {
+      //让用户选择打包位置
+      saveMizFile(mizFile, exportMiz)
+    }
   } else {
     notification('打包失败，原文件不存在!', '', null)
     debugInfo('mizFile not exist')
   }
 })
+
+async function saveMizFile(mizFile, export_fun){
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      title: '保存到',
+      defaultPath: projectFileNameBase + '_CN.miz',
+      filters: [{ name: 'DCS World 任务', extensions: ['miz'] }],
+    })
+    if (!canceled) {
+      export_fun(mizFile, filePath)
+    }
+}
 
 // 存在新的修改
 ipcMain.on('onTranslateTextChange', (e) => {
