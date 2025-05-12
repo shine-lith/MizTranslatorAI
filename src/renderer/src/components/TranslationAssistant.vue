@@ -1,6 +1,6 @@
 <script setup>
 import { ref, nextTick, onMounted, onUnmounted } from 'vue'
-import { settings } from '../store.js'
+import { store, settings } from '../store.js'
 
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
@@ -33,6 +33,9 @@ const dialog_editSystemPrompt_translate = ref(null)
 
 // 发送用户输入的问题到LLM询问队列
 function onChatSend() {
+  if(!store.projectPath){
+    return
+  }
   if (chatLoading.value) {
     return
   }
