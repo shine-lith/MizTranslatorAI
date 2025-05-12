@@ -124,16 +124,16 @@ ipcMain.on('llm:chat', async (e, data) => {
     }
   }
   try {
-  const stream = ollama.chat(request)
-  for await (const chunk of stream) {
-    var result = {
-      ...data,
-      ...{
-        done: chunk.done,
-        chunk: chunk.partial
+    const stream = ollama.chat(request)
+    for await (const chunk of stream) {
+      var result = {
+        ...data,
+        ...{
+          done: chunk.done,
+          chunk: chunk.partial
+        }
       }
-    }
-    win.webContents.send('onTranslateChunk', result)
+      win.webContents.send('onTranslateChunk', result)
     }
   } catch (error) {
     win.webContents.send('onTranslateChunk', {...data, ...{ done: true, chunk: '错误！无法连接到Ollama' } })
@@ -158,16 +158,16 @@ ipcMain.on('llm:generate', async (e, data) => {
     }
   }
   try{
-  const stream = ollama.generate(request)
-  for await (const chunk of stream) {
-    var result = {
-      ...data,
-      ...{
-        done: chunk.done,
-        chunk: chunk.partial
+    const stream = ollama.generate(request)
+    for await (const chunk of stream) {
+      var result = {
+        ...data,
+        ...{
+          done: chunk.done,
+          chunk: chunk.partial
+        }
       }
-    }
-    win.webContents.send('onTranslateChunk', result)
+      win.webContents.send('onTranslateChunk', result)
     }
   } catch (error) {
     win.webContents.send('onTranslateChunk', {...data, ...{ done: true, chunk: '错误！无法连接到Ollama' } })
@@ -177,7 +177,6 @@ ipcMain.on('llm:generate', async (e, data) => {
 
 ipcMain.on('dev:devFunction', () => {
   notification('通知', '这是一个通知', null)
-  // loadMizFile('/Users/lith/Dev/MizTranslatorAI/Cesar_Syria_[Helicoper_Combat_Rescue].miz')
 })
 
 ipcMain.on('titlebar:openFile', async () => {
@@ -277,6 +276,7 @@ function handleError(title, message, debugMsg) {
 
 // 处理字典文件的核心逻辑
 function processDictionary(zipfile, entry, file, cleanup) {
+  setProjectWorkPath(file)
   zipfile.openReadStream(entry, (err, readStream) => {
     if (err) {
       handleError('无法打开此文件', '文件可能已损坏', 'Cant read l10n/DEFAULT/dictionary')
@@ -334,7 +334,6 @@ function processContent(content) {
 
 // 成功处理
 function sendSuccess(file, listData) {
-  setProjectWorkPath(file)
   win.webContents.send('onMizOpen', 200, {
     mizFile: file,
     projectPath: projectPath,
