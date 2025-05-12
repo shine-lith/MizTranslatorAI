@@ -23,6 +23,7 @@ function onLineSend(data) {
 function onTranslateAll() {
   if(store.projectPath){
     store.listdata.forEach((data) => {
+      data.translateText = '';
       addQueue(data)
       textlistRef.value.setLineLoading(data, true)
     })
