@@ -107,7 +107,7 @@ onUnmounted(() => {
       @onSaveFile="onSaveFile"
       @onExportToMiz="onExportToMiz"
     />
-    <router-view v-slot="{ Component, route}">
+    <router-view v-slot="{ Component, route }">
       <Transition :name="route.meta.transition || 'slide'">
         <component :is="Component" />
       </Transition>
@@ -126,7 +126,7 @@ onUnmounted(() => {
 <style scoped>
 /* 动画 */
 .slide-in-enter-active,
-.slide-in-leave-active{
+.slide-in-leave-active {
   transition: all 300ms;
 }
 .slide-in-enter-from {
@@ -134,7 +134,7 @@ onUnmounted(() => {
 }
 
 .slide-out-enter-active,
-.slide-out-leave-active{
+.slide-out-leave-active {
   transition: all 300ms;
 }
 .slide-out-leave-to {

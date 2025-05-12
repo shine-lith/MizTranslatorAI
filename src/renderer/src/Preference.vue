@@ -43,7 +43,14 @@ onMounted(() => {
   <div id="preference" class="absolute w-full h-full pt-14 z-100">
     <div class="h-12 bg-gray-800 fixed w-full flex items-center">
       <div class="flex items-center gap-4">
-        <Button class="h-12" @click="back" size="small" icon="pi pi-arrow-left" label="返回" variant="text"></Button>
+        <Button
+          class="h-12"
+          @click="back"
+          size="small"
+          icon="pi pi-arrow-left"
+          label="返回"
+          variant="text"
+        ></Button>
         <h1>设置</h1>
       </div>
     </div>
@@ -96,8 +103,9 @@ onMounted(() => {
             autoResize
             variant="filled"
           />
-          <p class="text-sm text-gray-400">该提示词将有助于在问答过程中让LLM模型更好地理解问题，
-            {miz_data} 用来代表任务简报信息，是问答题提示词的关键内容，请勿删除
+          <p class="text-sm text-gray-400">
+            该提示词将有助于在问答过程中让LLM模型更好地理解问题， {miz_data}
+            用来代表任务简报信息，是问答题提示词的关键内容，请勿删除
           </p>
         </div>
 
@@ -176,12 +184,12 @@ onMounted(() => {
 </template>
 
 <style scoped>
-#preference{
+#preference {
   background-color: #000;
   scroll-behavior: smooth;
 }
 
-.scroll-smooth{
+.scroll-smooth {
   scroll-behavior: smooth;
 }
 </style>

@@ -136,7 +136,10 @@ ipcMain.on('llm:chat', async (e, data) => {
       win.webContents.send('onTranslateChunk', result)
     }
   } catch (error) {
-    win.webContents.send('onTranslateChunk', {...data, ...{ done: true, chunk: '错误！无法连接到Ollama' } })
+    win.webContents.send('onTranslateChunk', {
+      ...data,
+      ...{ done: true, chunk: '错误！无法连接到Ollama' }
+    })
     notification('请求失败', '请检查Ollama的配置和运行情况', null)
   }
 })
@@ -157,7 +160,7 @@ ipcMain.on('llm:generate', async (e, data) => {
       temperature: data.temperature
     }
   }
-  try{
+  try {
     const stream = ollama.generate(request)
     for await (const chunk of stream) {
       var result = {
@@ -170,7 +173,10 @@ ipcMain.on('llm:generate', async (e, data) => {
       win.webContents.send('onTranslateChunk', result)
     }
   } catch (error) {
-    win.webContents.send('onTranslateChunk', {...data, ...{ done: true, chunk: '错误！无法连接到Ollama' } })
+    win.webContents.send('onTranslateChunk', {
+      ...data,
+      ...{ done: true, chunk: '错误！无法连接到Ollama' }
+    })
     notification('请求失败', '请检查Ollama的配置和运行情况', null)
   }
 })
@@ -539,8 +545,7 @@ ipcMain.on('titlebar:exportToMiz', (e, data) => {
         fs.copyFileSync(mizFile, projectFileNameBase + '_Backup.miz')
       }
       exportMiz(mizFile, mizFile) // 覆盖到原文件
-    }
-    else {
+    } else {
       //让用户选择打包位置
       saveMizFile(mizFile, exportMiz)
     }
@@ -550,15 +555,15 @@ ipcMain.on('titlebar:exportToMiz', (e, data) => {
   }
 })
 
-async function saveMizFile(mizFile, export_fun){
-    const { canceled, filePath } = await dialog.showSaveDialog({
-      title: '保存到',
-      defaultPath: projectFileNameBase + '_CN.miz',
-      filters: [{ name: 'DCS World 任务', extensions: ['miz'] }],
-    })
-    if (!canceled) {
-      export_fun(mizFile, filePath)
-    }
+async function saveMizFile(mizFile, export_fun) {
+  const { canceled, filePath } = await dialog.showSaveDialog({
+    title: '保存到',
+    defaultPath: projectFileNameBase + '_CN.miz',
+    filters: [{ name: 'DCS World 任务', extensions: ['miz'] }]
+  })
+  if (!canceled) {
+    export_fun(mizFile, filePath)
+  }
 }
 
 // 存在新的修改

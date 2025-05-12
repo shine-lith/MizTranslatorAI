@@ -93,7 +93,7 @@ function showPreference() {
 </template>
 
 <style scoped>
-#titlebar{
+#titlebar {
   background-color: #1e1e1e;
 }
 #apptitle {

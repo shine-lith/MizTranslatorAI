@@ -21,9 +21,9 @@ function onLineSend(data) {
 
 // 自动翻译所有
 function onTranslateAll() {
-  if(store.projectPath){
+  if (store.projectPath) {
     store.listdata.forEach((data) => {
-      data.translateText = '';
+      data.translateText = ''
       addQueue(data)
       textlistRef.value.setLineLoading(data, true)
     })

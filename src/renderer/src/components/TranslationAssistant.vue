@@ -33,7 +33,7 @@ const dialog_editSystemPrompt_translate = ref(null)
 
 // 发送用户输入的问题到LLM询问队列
 function onChatSend() {
-  if(!store.projectPath){
+  if (!store.projectPath) {
     return
   }
   if (chatLoading.value) {
@@ -210,8 +210,20 @@ onUnmounted(() => {
         size="small"
         icon="pi pi-stop"
       />
-      <Button @click="dialogEditSystemPromptShow" label="提示词设置" icon="pi pi-wrench"  variant="text" size="small" />
-      <Button @click="clearHistory" label="清空" icon="pi pi-delete-left" variant="text" size="small" />
+      <Button
+        @click="dialogEditSystemPromptShow"
+        label="提示词设置"
+        icon="pi pi-wrench"
+        variant="text"
+        size="small"
+      />
+      <Button
+        @click="clearHistory"
+        label="清空"
+        icon="pi pi-delete-left"
+        variant="text"
+        size="small"
+      />
     </div>
   </div>
   <div ref="componentContainer" class="h-full overflow-y-auto pl-0 pr-3 gap-2">
