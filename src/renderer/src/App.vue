@@ -57,9 +57,9 @@ function onExportToMiz() {
   if (isMizLoaded()) {
     const data = {
       listdata: store.listdata,
-      overwrite: settings.overwrite,
-      backup: settings.backup,
-      translate_compare: settings.translate_compare
+      overwrite: settings.value.overwrite,
+      backup: settings.value.backup,
+      translate_compare: settings.value.translate_compare
     }
     window.api.onExportToMiz(JSON.stringify(data))
   }
