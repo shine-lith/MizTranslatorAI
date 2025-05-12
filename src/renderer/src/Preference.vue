@@ -71,7 +71,7 @@ onMounted(() => {
         <div class="flex flex-col mb-4">
           <div class="flex mb-1 gap-2">
             <Checkbox v-model="settings.backup" inputId="backup" binary />
-            <label for="backup"> 创建备份 </label>
+            <label for="backup"> 覆盖原文件时创建备份 </label>
           </div>
           <div class="text-sm text-gray-400"><p>打包前备份原miz文件</p></div>
         </div>
