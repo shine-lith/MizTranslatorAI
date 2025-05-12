@@ -21,11 +21,12 @@ function onLineSend(data) {
 
 // 自动翻译所有
 function onTranslateAll() {
-  //todo add all store.data to list
-  store.listdata.forEach((data) => {
-    addQueue(data)
-    textlistRef.value.setLineLoading(data, true)
-  })
+  if(store.projectPath){
+    store.listdata.forEach((data) => {
+      addQueue(data)
+      textlistRef.value.setLineLoading(data, true)
+    })
+  }
 }
 
 // 向LLM交互队列里添加任务
