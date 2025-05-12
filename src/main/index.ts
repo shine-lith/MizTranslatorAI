@@ -92,7 +92,7 @@ app.on('window-all-closed', () => {
 })
 
 // 访问ollama api 获取已有模型列表
-ipcMain.handle('ollama:list', async (e, data) => {
+ipcMain.handle('ollama:list', async (_e, data) => {
   const ollama = new TranslateOllama({
     host: data.host,
     maxRetries: 1
@@ -107,7 +107,7 @@ ipcMain.handle('ollama:list', async (e, data) => {
 })
 
 // ollama 对话请求
-ipcMain.on('llm:chat', async (e, data) => {
+ipcMain.on('llm:chat', async (_e, data) => {
   const ollama = new TranslateOllama({
     host: data.host,
     maxRetries: 1
@@ -145,7 +145,7 @@ ipcMain.on('llm:chat', async (e, data) => {
 })
 
 // ollama 生成式请求
-ipcMain.on('llm:generate', async (e, data) => {
+ipcMain.on('llm:generate', async (_e, data) => {
   const ollama = new TranslateOllama({
     host: data.host,
     maxRetries: 1
@@ -298,7 +298,7 @@ function processDictionary(zipfile, entry, file, cleanup) {
         const listData = processContent(fullContent)
         sendSuccess(file, listData)
       } catch (exception) {
-        handleError('文件解析失败', '内容格式不符合要求', `Parse error: ${exception.message}`)
+        handleError('文件解析失败', '内容格式不符合要求', `Parse error: ${exception}`)
       } finally {
         cleanup()
       }
@@ -457,25 +457,25 @@ ipcMain.on('window:maximize', function () {
 ipcMain.on('window:close', () => win.close())
 
 // 复制文字到剪贴板
-ipcMain.on('textToClipboard', (e, text) => {
+ipcMain.on('textToClipboard', (_e, text) => {
   clipboard.writeText(text)
   notification('内容已复制', '', null)
 })
 
 // 打开文件
-ipcMain.on('openFile', (e) => {
+ipcMain.on('openFile', (_e) => {
   openFile()
 })
 
 // 保存工程并关闭
-ipcMain.on('onCloseAndSaveProject', (e, data) => {
+ipcMain.on('onCloseAndSaveProject', (_e, data) => {
   saveTranFile(data)
   win = null
   app.exit()
 })
 
 // 保存工程
-ipcMain.on('titlebar:saveFile', (e, data) => {
+ipcMain.on('titlebar:saveFile', (_e, data) => {
   saveTranFile(data)
   notification('工程已保存', '点击打开保存位置', {
     method: 'openFolder',
@@ -484,7 +484,7 @@ ipcMain.on('titlebar:saveFile', (e, data) => {
 })
 
 // 导出miz文件
-ipcMain.on('titlebar:exportToMiz', (e, data) => {
+ipcMain.on('titlebar:exportToMiz', (_e, data) => {
   data = JSON.parse(data)
 
   const DCS_DICT_STR_BR = '\\\n'
@@ -567,16 +567,16 @@ async function saveMizFile(mizFile, export_fun) {
 }
 
 // 存在新的修改
-ipcMain.on('onTranslateTextChange', (e) => {
+ipcMain.on('onTranslateTextChange', (_e) => {
   tranNeedSave = true
 })
 
 // 使用外部浏览器打开网页
-ipcMain.on('openURL', (e, data) => {
+ipcMain.on('openURL', (_e, data) => {
   shell.openExternal(data)
 })
 
 // 打开
-ipcMain.on('openFolder', (e, data) => {
+ipcMain.on('openFolder', (_e, data) => {
   shell.showItemInFolder(data)
 })
