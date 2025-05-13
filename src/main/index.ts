@@ -30,7 +30,7 @@ function createWindow(): void {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
     },
-    icon: '/app.ico'
+    icon: join(__dirname,'../../resources/icon.ico')
   })
 
   win.setTitle(APP_NAME)

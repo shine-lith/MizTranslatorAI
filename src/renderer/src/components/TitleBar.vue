@@ -72,7 +72,7 @@ function showPreference() {
 <template>
   <div id="titlebar" class="h-14 w-full fixed flex z-999">
     <div id="menu" class="flex flex-none">
-      <img class="m-4" src="../assets/app.svg" />
+      <img class="m-4" src="../assets/app.png" />
       <Button @click="onOpenFile" size="small" label="打开" icon="pi pi-file" variant="text" />
       <Button @click="onSaveFile" size="small" label="保存" icon="pi pi-save" variant="text" />
       <Button @click="onExportToMiz" size="small" label="打包" icon="pi pi-box" variant="text" />
