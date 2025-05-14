@@ -177,6 +177,7 @@ onMounted(() => {
             />
             <InputText size="small" v-model.number="settings.ollama_temperature" class="w-12" />
           </div>
+          <div class="text-sm text-gray-400"><p>严谨与想象 数值低结果趋向严谨，数值高结果趋向想象</p></div>
         </div>
       </div>
     </div>
