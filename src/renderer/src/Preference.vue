@@ -41,7 +41,7 @@ onMounted(() => {
 </script>
 <template>
   <div id="preference" class="absolute w-full h-full pt-14 z-100">
-    <div class="h-12 bg-gray-800 fixed w-full flex items-center">
+    <div class="h-12 bg-gray-700 fixed w-full flex items-center">
       <div class="flex items-center gap-4">
         <Button
           class="h-12"
@@ -61,6 +61,7 @@ onMounted(() => {
           <a href="#setting"><li class="p-3">设置</li></a>
           <a href="#prompt"><li class="p-3">LLM翻译设置</li></a>
           <a href="#ollama"><li class="p-3">Ollama</li></a>
+          <a href="#about"><li class="p-3">关于</li></a>
         </ol>
       </div>
 
@@ -179,6 +180,19 @@ onMounted(() => {
           </div>
           <div class="text-sm text-gray-400"><p>严谨与想象 数值低结果趋向严谨，数值高结果趋向想象</p></div>
         </div>
+
+      
+        <h1 class="text-xl py-5" id="about" name="about">关于 mizTranslatorAI</h1>
+
+        <div class="flex flex-col mb-4">
+          <div class="flex mb-1 gap-2">
+            <span for="overwrite">当前版本: 1.0.0</span>
+          </div>
+
+          <div class="flex mb-1 gap-2">
+            <span for="overwrite">作者: lith</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -186,7 +200,7 @@ onMounted(() => {
 
 <style scoped>
 #preference {
-  background-color: #000;
+  background-color: #18181b;
   scroll-behavior: smooth;
 }
 
