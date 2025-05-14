@@ -31,7 +31,7 @@ function onMizOpen(e, code, data) {
     store.projectPath = data.projectPath
     store.listdata = datalist
     store.mission_data = mission_data
-    titleBarRef.value.setTitle(`mizTranslator - ${data.mizFile}`)
+    titleBarRef.value.setTitle(`mizTranslatorAI - ${data.mizFile}`)
   }
 }
 

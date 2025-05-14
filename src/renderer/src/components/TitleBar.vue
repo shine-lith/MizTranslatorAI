@@ -16,7 +16,7 @@ defineExpose({
 
 const emit = defineEmits(['onOpenFile', 'onSaveFile', 'onExportToMiz'])
 
-const titleText = ref('mizTranslator')
+const titleText = ref('mizTranslatorAI')
 
 // watch (
 //   () => store.mizFile,
