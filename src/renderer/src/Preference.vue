@@ -58,15 +58,15 @@ onMounted(() => {
     <div class="pt-12 h-full flex">
       <div class="text-sm flex flex-col w-60 overflow-hidden">
         <ol>
-          <a href="#setting"><li class="p-3">设置</li></a>
-          <a href="#prompt"><li class="p-3">LLM翻译设置</li></a>
-          <a href="#ollama"><li class="p-3">Ollama</li></a>
-          <a href="#about"><li class="p-3">关于</li></a>
+          <a href="#export"><li class="p-5">打包</li></a>
+          <a href="#prompt"><li class="p-5">LLM翻译设置</li></a>
+          <a href="#ollama"><li class="p-5">Ollama</li></a>
+          <a href="#about"><li class="p-5">关于</li></a>
         </ol>
       </div>
 
       <div class="text-sm pr-4 pb-20 flex-1 overflow-y-auto scroll-smooth">
-        <h1 class="text-xl py-5" id="setting" name="setting">设置</h1>
+        <h1 class="text-xl py-5" id="export" name="export">打包</h1>
 
         <div class="flex flex-col mb-4">
           <div class="flex mb-1 gap-2">
