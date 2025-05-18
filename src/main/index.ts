@@ -501,6 +501,10 @@ ipcMain.on('titlebar:exportToMiz', (_e, data) => {
     dictionaryContent += 'dictionary = \n{\n'
     data.listdata.forEach((item) => {
       if (item.translateText) {
+        // 忽略掉原文和译文相同的内容，如果行是程序代码，对照模式会导致代码运行错误
+        if (item.translateText == item.originText){
+          return;
+        }
         var key = item.key
         var translateText = toDcsDictStr(item.translateText)
         if (data.translate_compare) {
