@@ -68,6 +68,9 @@ function getMessageHistory() {
 
 // 添加用户输入行
 async function addUserLine(question_id, dictkey, text) {
+  if(componentList.value.length >= 100){
+    componentList.value.shift()
+  }
   componentList.value.push({
     id: ++counter.value,
     name: 'ChatBubble', // 必须已注册
@@ -84,6 +87,9 @@ async function addUserLine(question_id, dictkey, text) {
 
 // 添加LLM的反馈行
 async function addAssistantLine(question_id, dictkey) {
+  if(componentList.value.length >= 100){
+    componentList.value.shift()
+  }
   componentList.value.push({
     id: ++counter.value,
     name: 'ChatBubble', // 必须已注册
