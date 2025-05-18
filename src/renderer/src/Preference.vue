@@ -186,7 +186,7 @@ onMounted(() => {
 
         <div class="flex flex-col mb-4">
           <div class="flex mb-1 gap-2">
-            <span for="overwrite">当前版本: 1.0.0</span>
+            <span for="overwrite">当前版本: 1.0.0 EA</span>
           </div>
 
           <div class="flex mb-1 gap-2">
