@@ -512,7 +512,7 @@ ipcMain.on('titlebar:exportToMiz', (_e, data) => {
             DCS_DICT_STR_BR +
             translateText
         }
-        dictionaryContent += `    ['${key}'] = '${translateText}',\n`
+        dictionaryContent += `    ["${key}"] = "${translateText}",\n`
       }
     })
     dictionaryContent += '} -- end of dictionary\n'
