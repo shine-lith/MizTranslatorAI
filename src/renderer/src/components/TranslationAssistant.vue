@@ -12,7 +12,8 @@ defineExpose({
   addUserLine,
   addAssistantLine,
   getMessageHistory,
-  scrollToBottom
+  scrollToBottom,
+  clearHistory
 })
 
 const props = defineProps({
@@ -172,11 +173,17 @@ function onTranslateChunk(e, data) {
   }
 }
 
+function onMizOpen(e, code, data) {
+  clearHistory();
+}
+
 onMounted(() => {
+  window.electron.ipcRenderer.on('onMizOpen', onMizOpen)
   window.electron.ipcRenderer.on('onTranslateChunk', onTranslateChunk)
 })
 
 onUnmounted(() => {
+  window.electron.ipcRenderer.removeAllListeners('onMizOpen')
   window.electron.ipcRenderer.removeAllListeners('onTranslateChunk')
 })
 </script>
