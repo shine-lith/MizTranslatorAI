@@ -2,6 +2,11 @@
 import { reactive } from 'vue'
 import { useStorage } from '@vueuse/core'
 
+export const strRes = {
+  chat_prompt: '你是一个军事参谋，即将展开一次军事行动，之后会提供这次行动的必要信息。你需要结合这些信息，回答用户提出的问题并尽可能全面的提供帮助。使用中文进行回答。以下是这次行动的信息：\r\n{miz_data}',
+  translate_prompt: '为军事模拟飞行游戏进行内容翻译，将用户输入的内容翻译为中文\r\n直接返回翻译结果，不需要进一步明确\r\n说话的人(以:开头)、人名、地名、代号、呼号、编号、军事术语、缩写保持原文\r\n如果是程序代码则不翻译，保持原文返回'
+}
+
 // 字符串资源类型映射/设置表
 export const miz_dictkey = {
   sortie: { text: '1.任务名称', keep: true },
@@ -31,12 +36,10 @@ export const store = reactive({
 
 export const settings = useStorage('settings', {
   overwrite: true,
-  backup: false,
+  backup: true,
   translate_compare: false,
-  chat_prompt:
-    '你是一个军事参谋，即将展开一次军事行动，之后会提供这次行动的必要信息。你需要结合这些信息，回答用户提出的问题并尽可能全面的提供帮助。使用中文进行回答。以下是这次行动的信息：\r\n{miz_data}',
-  translate_prompt:
-    '为军事模拟飞行游戏进行内容翻译，将用户输入的内容翻译为中文\r\n直接返回翻译结果，不需要进一步明确\r\n说话的人(以:开头)、人名、地名、代号、呼号、编号、军事术语、缩写保持原文\r\n如果是程序代码则返回原文',
+  chat_prompt: strRes.chat_prompt,
+  translate_prompt: strRes.translate_prompt,
   ollama_host: 'http://127.0.0.1:11434',
   ollama_model: null,
   ollama_model_list: null,

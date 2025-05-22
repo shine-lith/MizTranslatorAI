@@ -1,6 +1,6 @@
 <script setup>
 import { ref, nextTick, onMounted, onUnmounted } from 'vue'
-import { store, settings } from '../store.js'
+import { store, settings, strRes } from '../store.js'
 
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
@@ -183,6 +183,14 @@ function onMizOpen(e, code, data) {
   clearHistory();
 }
 
+function resetChatPrompt() {
+  dialog_editSystemPrompt_chat.value = strRes.chat_prompt
+}
+
+function resetTranslatePrompt() {
+  dialog_editSystemPrompt_translate.value = strRes.translate_prompt
+}
+
 onMounted(() => {
   window.electron.ipcRenderer.on('onMizOpen', onMizOpen)
   window.electron.ipcRenderer.on('onTranslateChunk', onTranslateChunk)
@@ -287,6 +295,15 @@ onUnmounted(() => {
         autoResize
         variant="filled"
       />
+      <div class="flex justify-end">
+        <Button
+            class="w-20"
+            @click="resetChatPrompt"
+            label="恢复默认"
+            severity="secondary"
+            size="small"
+        />
+      </div>
     </div>
     <div>
       <label for="translate_prompt">翻译提示词</label>
@@ -297,6 +314,15 @@ onUnmounted(() => {
         autoResize
         variant="filled"
       />
+      <div class="flex justify-end">
+        <Button
+            class="w-20"
+            @click="resetTranslatePrompt"
+            label="恢复默认"
+            severity="secondary"
+            size="small"
+        />
+      </div>
     </div>
     <template #footer>
       <Button

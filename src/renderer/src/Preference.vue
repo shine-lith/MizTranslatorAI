@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { settings } from './store.js'
+import { settings, strRes } from './store.js'
 
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
@@ -16,6 +16,14 @@ const ollamaModels = ref()
 
 function back() {
   router.back()
+}
+
+function resetChatPrompt() {
+  settings.value.chat_prompt = strRes.chat_prompt
+}
+
+function resetTranslatePrompt() {
+  settings.value.translate_prompt = strRes.translate_prompt
 }
 
 // 刷新Ollama模型列表
@@ -41,7 +49,7 @@ onMounted(() => {
 </script>
 <template>
   <div id="preference" class="absolute w-full h-full pt-14 z-100">
-    <div class="h-12 bg-gray-700 fixed w-full flex items-center">
+    <div class="h-12 bg-light_gray fixed w-full flex items-center">
       <div class="flex items-center gap-4">
         <Button
           class="h-12"
@@ -59,7 +67,7 @@ onMounted(() => {
       <div class="text-sm flex flex-col w-60 overflow-hidden">
         <ol>
           <a href="#export"><li class="p-5">打包</li></a>
-          <a href="#prompt"><li class="p-5">LLM翻译设置</li></a>
+          <a href="#prompt"><li class="p-5">LLM提示词</li></a>
           <a href="#ollama"><li class="p-5">Ollama</li></a>
           <a href="#about"><li class="p-5">关于</li></a>
         </ol>
@@ -92,7 +100,7 @@ onMounted(() => {
           <div class="text-sm text-gray-400"><p>同时显示两种语言</p></div>
         </div>
 
-        <h1 class="text-xl py-5" name="prompt" id="prompt">翻译提示词</h1>
+        <h1 class="text-xl py-5" name="prompt" id="prompt">LLM提示词</h1>
 
         <div class="flex flex-col mb-4 gap-1">
           <label for="chat_prompt">问答提示词</label>
@@ -108,6 +116,15 @@ onMounted(() => {
             该提示词将有助于在问答过程中让LLM模型更好地理解问题， {miz_data}
             用来代表任务简报信息，是问答题提示词的关键内容，请勿删除
           </p>
+          <div class="flex justify-end">
+            <Button
+                class="w-20"
+                @click="resetChatPrompt"
+                label="恢复默认"
+                severity="secondary"
+                size="small"
+            />
+          </div>
         </div>
 
         <div class="flex flex-col mb-4 gap-1">
@@ -121,6 +138,15 @@ onMounted(() => {
             variant="filled"
           />
           <p class="text-sm text-gray-400">该提示词将引导LLM模型翻译文本</p>
+          <div class="flex justify-end">
+            <Button
+                class="w-20"
+                @click="resetTranslatePrompt"
+                label="恢复默认"
+                severity="secondary"
+                size="small"
+            />
+          </div>
         </div>
 
         <h1 class="text-xl py-5" name="ollama" id="ollama">Ollama</h1>
