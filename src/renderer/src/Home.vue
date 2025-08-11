@@ -85,7 +85,8 @@ function run() {
           question_id: question_id,
           key: data.key,
           originText: data.originText,
-          keep_alive: '3m'
+          keep_alive: '3m',
+          code_check: settings.value.code_check
         })
       }
     }

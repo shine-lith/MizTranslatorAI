@@ -35,6 +35,7 @@ export const store = reactive({
 })
 
 export const settings = useStorage('settings', {
+  code_check: false,
   overwrite: true,
   backup: true,
   translate_compare: false,

@@ -130,7 +130,8 @@ ipcMain.on('llm:chat', async (_e, data) => {
         ...data,
         ...{
           done: chunk.done,
-          chunk: chunk.partial
+          chunk: chunk.partial,
+          success: true
         }
       }
       win.webContents.send('onTranslateChunk', result)
@@ -150,28 +151,55 @@ ipcMain.on('llm:generate', async (_e, data) => {
     host: data.host,
     maxRetries: 1
   })
-  const request = {
-    model: data.model,
-    prompt: data.prompt,
-    system: data.system,
-    stream: data.stream,
-    keep_alive: data.keep_alive,
-    options: {
-      temperature: data.temperature
-    }
-  }
   try {
-    const stream = ollama.generate(request)
-    for await (const chunk of stream) {
-      var result = {
-        ...data,
-        ...{
-          done: chunk.done,
-          chunk: chunk.partial
+    var iscode = false
+    if (data.code_check){
+      const response = await ollama.ollama.generate({
+        model: data.model,
+        prompt: data.prompt,
+        system: "判断输入的内容是不是程序代码或脚本。要求：是则返回 true 不是则返回 false",
+        stream: false,
+        think: false,
+        keep_alive: data.keep_alive,
+        options: {
+          temperature: 0.15
         }
-      }
-      win.webContents.send('onTranslateChunk', result)
+      })
+      // 匹配 <think> 标签及其内容（包括多行情况）
+      const regex = /<think\b[^>]*>[\s\S]*?<\/think>/g
+      var result = response.response.replace(regex, '')
+      iscode = result.toLowerCase().includes('true')
     }
+    if(!iscode) {
+      // 翻译请求
+      const stream = await ollama.generate({
+        model: data.model,
+        prompt: data.prompt,
+        system: data.system,
+        stream: data.stream,
+        keep_alive: data.keep_alive,
+        options: {
+          temperature: data.temperature
+        }
+      })
+      for await (const chunk of stream) {
+        var result = {
+          ...data,
+          ...{
+            done: chunk.done,
+            success: true,
+            chunk: chunk.partial
+          }
+        }
+        win.webContents.send('onTranslateChunk', result)
+      }
+    } else{
+      win.webContents.send('onTranslateChunk', {
+        ...data,
+        ...{ done: true, chunk: '错误！翻译内容为程序代码' }
+      })
+    }
+
   } catch (error) {
     win.webContents.send('onTranslateChunk', {
       ...data,

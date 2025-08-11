@@ -34,8 +34,11 @@ async function onLineSendButton(data, index) {
 function onTranslateChunk(e, data) {
   var line = store.listdata.find((d) => d.key == data.key)
   if (line) {
-    // 更新内容
-    line.translateText += data.chunk
+    // 只处理翻译正确的信息
+    if(data.success){
+      // 更新内容
+      line.translateText += data.chunk
+    }
     if (data.done) {
       // 忽略思考内容
       line.translateText = removeThinkTags(line.translateText)

@@ -160,6 +160,7 @@ function onTranslateChunk(e, data) {
     scrollToBottom()
   }
 
+  // 交互区只输出内容，所以可以忽略data.success
   if (data.done) {
     chatLoading.value = false
     if (user) {

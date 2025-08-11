@@ -66,6 +66,7 @@ onMounted(() => {
     <div class="pt-12 h-full flex">
       <div class="text-sm flex flex-col w-60 overflow-hidden">
         <ol>
+          <a href="#translate"><li class="p-5">翻译</li></a>
           <a href="#export"><li class="p-5">打包</li></a>
           <a href="#prompt"><li class="p-5">LLM提示词</li></a>
           <a href="#ollama"><li class="p-5">Ollama</li></a>
@@ -74,6 +75,19 @@ onMounted(() => {
       </div>
 
       <div class="text-sm pr-4 pb-20 flex-1 overflow-y-auto scroll-smooth">
+
+        <h1 class="text-xl py-5" id="translate" name="translate">翻译</h1>
+
+        <div class="flex flex-col mb-4">
+          <div class="flex mb-1 gap-2">
+            <Checkbox v-model="settings.code_check" inputId="codecheck" binary />
+            <label for="codecheck"> 代码过滤 </label>
+          </div>
+          <div class="text-sm text-gray-400"><p>部分miz中的文本里含有lua代码，代码被翻译则会导致任务报错。勾选此选项对文本进行一次代码过滤，减少报错概率。<br/>
+            使用有思维链的模型会极大减慢翻译速度</p></div>
+        </div>
+
+
         <h1 class="text-xl py-5" id="export" name="export">打包</h1>
 
         <div class="flex flex-col mb-4">
