@@ -94,8 +94,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  window.electron.ipcRenderer.removeAllListeners('onMizOpen')
-  window.electron.ipcRenderer.removeAllListeners('onNotification')
+  window.electron.ipcRenderer.removeListener('onMizOpen', onMizOpen)
+  window.electron.ipcRenderer.removeListener('onNotification', onNotification)
 })
 </script>
 

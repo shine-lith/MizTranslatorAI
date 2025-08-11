@@ -197,8 +197,8 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  window.electron.ipcRenderer.removeAllListeners('onMizOpen')
-  window.electron.ipcRenderer.removeAllListeners('onTranslateChunk')
+  window.electron.ipcRenderer.removeListener('onMizOpen', onMizOpen)
+  window.electron.ipcRenderer.removeListener('onTranslateChunk', onTranslateChunk)
 })
 </script>
 

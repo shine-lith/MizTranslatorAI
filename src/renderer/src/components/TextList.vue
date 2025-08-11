@@ -26,6 +26,7 @@ async function onLineSendButton(data, index) {
   // 启动loading动画
   if (loadingStates.value[data.key]) return
   setLineLoading(data, true)
+  data.method = 'translate'
   emit('onLineSend', data)
 }
 

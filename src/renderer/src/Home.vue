@@ -24,6 +24,7 @@ function onTranslateAll() {
   if (store.projectPath) {
     store.listdata.forEach((data) => {
       data.translateText = ''
+      data.method = 'translate'
       addQueue(data)
       textlistRef.value.setLineLoading(data, true)
     })
@@ -69,7 +70,9 @@ function run() {
           originText: data.originText,
           keep_alive: '3m'
         })
-      } else {
+      } 
+      
+      if (data.method === 'translate') {
         // llm翻译
         window.api.llmGenerate({
           api: 'ollama',
